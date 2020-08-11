@@ -1,0 +1,10 @@
+<button mat-button (click)="downloadPdf($event)">Download</button>
+<input type="file" (change)="importImages($event.target.files)" multiple>
+<canvas #TmpCanvas [ngStyle]="getCanvasStyle()"></canvas>
+<canvas #markAnalyzer class="mark-analyzer" width="32" height="32"></canvas>
+<div #pages id="pages">
+  <app-marking-sheet></app-marking-sheet>
+  <!--div *ngFor="let page of pageTitles" class="page">
+    <h1>{{page}}</h1>
+  </div-->
+</div>

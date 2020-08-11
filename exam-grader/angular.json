@@ -28,9 +28,18 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/aruco-marker/aruco-marker.js",
+              "./node_modules/perspective-transform/dist/perspective-transform.min.js",
+              "./node_modules/js-aruco/src/cv.js",
+              "./node_modules/js-aruco/src/aruco.js",
+              "./node_modules/js-aruco/src/svd.js",
+              "./node_modules/js-aruco/src/posit1.js",
+              "./node_modules/js-aruco/src/posit2.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -92,6 +101,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -123,6 +133,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "exam-grader"
 }

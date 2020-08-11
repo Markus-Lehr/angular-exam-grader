@@ -1,0 +1,102 @@
+:host {
+  display: block;
+  position: relative;
+  width: 210*5px;
+  height: 297*5px;
+}
+
+.debug-border {
+  outline: 1px solid lightgrey;
+}
+
+.content-wrapper {
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  position: absolute;
+
+  .inner-content-wrapper {
+    left: 50px;
+    right: 50px;
+    top: 50px;
+    bottom: 50px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+
+    .exam-header {
+      height: 150px;
+    }
+
+    .spacer {
+      height: 10px;
+    }
+
+    .mark-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: row;
+    }
+  }
+}
+
+.question-labels {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+
+  .question-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    height: 100px;
+  }
+}
+
+
+.marks {
+  display: flex;
+  flex-direction: column;
+
+  .mark-slices {
+    display: flex;
+    flex-direction: row;
+    height: 100px;
+    margin-bottom: 10px;
+
+    .mark-slice {
+      display: flex;
+      flex-direction: column;
+      margin-right: 10px;
+
+      * {
+        height: 20px;
+        width: 20px;
+      }
+    }
+  }
+}
+
+.aruco-marker {
+  position: absolute;
+  display: block;
+  width: 50px;
+  height: 50px;
+}
+
+.aruco-left {
+  left: 0;
+}
+
+.aruco-right {
+  right: 0;
+}
+
+.aruco-top {
+  top: 0;
+}
+
+.aruco-bottom {
+  bottom: 0;
+}

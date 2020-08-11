@@ -1,0 +1,29 @@
+<div class="content-wrapper debug-border">
+  <div #topLeftArucoMarker class="aruco-marker aruco-top aruco-left"></div>
+  <div #topRightArucoMarker class="aruco-marker aruco-top aruco-right"></div>
+  <div #bottomLeftArucoMarker class="aruco-marker aruco-bottom aruco-left"></div>
+  <div #bottomRightArucoMarker class="aruco-marker aruco-bottom aruco-right"></div>
+
+  <div class="inner-content-wrapper debug-border">
+    <div class="exam-header debug-border"></div>
+    <div class="spacer debug-border"></div>
+    <div class="mark-container debug-border">
+      <div class="question-labels debug-border">
+        <div *ngFor="let question of examManager.exam.questions; index as i" class="question-row debug-border">
+          <label>Question {{i + 1}}:</label>
+          <label>True</label>
+          <label>False</label>
+        </div>
+      </div>
+      <div class="marks debug-border">
+        <div *ngFor="let markRow of examManager.marks; index as i" class="mark-slices debug-border">
+          <div *ngFor="let coord of markRow; index as j" class="mark-slice">
+            <label>({{examManager.getChar(j)}})</label>
+            <mat-checkbox></mat-checkbox>
+            <mat-checkbox></mat-checkbox>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
