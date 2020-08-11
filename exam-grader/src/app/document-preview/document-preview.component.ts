@@ -6,6 +6,9 @@ import {Point} from "@angular/cdk/drag-drop";
 import {AR} from "js-aruco";
 import PerspT from "perspective-transform";
 import {AnswerSheetEvaluation, AnswerState, BatchResult} from "../batch-result";
+import * as JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
+import {TensorflowCheckboxEvaluatorService} from "../tensorflow-checkbox-evaluator.service";
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -15,8 +18,6 @@ const a4width = 210 * 5 - 2 * 10 /* white padding */;
 const a4height = 297 * 5 - 2 * 10 /* white padding*/;
 const filledColor = "rgba(0, 200, 200, .3)";
 const emptyColor = "rgba(0, 0, 200, .2)";
-const brightNessThreshold = 850;
-
 
 @Component({
   selector: 'app-document-preview',
@@ -33,7 +34,15 @@ export class DocumentPreviewComponent implements OnInit {
   public canvHeight = topPadding + bottomPadding
   private batchResult: BatchResult = {sheets: {}}
 
-  constructor(private elRef: ElementRef, private examManager: ExamManagerService) {
+  constructor(private elRef: ElementRef, private examManager: ExamManagerService, private tfEval: TensorflowCheckboxEvaluatorService) {
+  }
+
+  private static flattenPoints(pts: Point[]): number[] {
+    const arr: number[] = [];
+    for (const pt of pts) {
+      arr.push(pt.x, pt.y);
+    }
+    return arr;
   }
 
   ngOnInit(): void {
@@ -59,22 +68,6 @@ export class DocumentPreviewComponent implements OnInit {
       await pdf.addImage(contentDataURL, 'JPEG', 0, 0, 210, 297);
     }
     pdf.save('test.pdf');
-  }
-
-  private markToPx(questionIndex: number, markIndex: number, truthValue: boolean): Point {
-    const xOffset =
-      50 /* marker width */ +
-      100 /* question label width */;
-    const yOffset =
-      50 /* marker height */ +
-      150 /* exam header height */ +
-      10 /* spacer height */ +
-      ((100 + 10) * questionIndex) /* previous question boxes' height + bottom margin */ +
-      20 /* label height */;
-    return {
-      x: xOffset + markIndex * 30 /* checkbox width (20) + margin (10) */,
-      y: yOffset + (truthValue ? 0 : 20) /* checkbox height (20) */
-    }
   }
 
   async getImgCorners(img: HTMLImageElement, cx: CanvasRenderingContext2D): Promise<Point[]> {
@@ -121,14 +114,6 @@ export class DocumentPreviewComponent implements OnInit {
     return corners;
   }
 
-  private static flattenPoints(pts: Point[]): number[] {
-    const arr: number[] = [];
-    for (const pt of pts) {
-      arr.push(pt.x, pt.y);
-    }
-    return arr;
-  }
-
   async processImage(img: HTMLImageElement, cx: CanvasRenderingContext2D, original: File) {
     const sourceCorners: Point[] = [
       {x: 0, y: 0},
@@ -151,9 +136,10 @@ export class DocumentPreviewComponent implements OnInit {
     const transformedWidth = perspT.transform(520, 0)[0] - perspT.transform(500, 0)[0];
     const transformedHeight = perspT.transform(0, 520)[1] - perspT.transform(0, 500)[1];
     const markCx: CanvasRenderingContext2D = this.markAnalyzerCanvas.nativeElement.getContext('2d');
-    const brightNesses: number[] = [];
     const trueCertainTies: number[][] = [];
     const falseCertainTies: number[][] = [];
+    let zip = new JSZip();
+
     for (let i = 0; i < this.examManager.exam.questions.length; i++) {
       trueCertainTies.push([]);
       falseCertainTies.push([]);
@@ -170,35 +156,36 @@ export class DocumentPreviewComponent implements OnInit {
           const falseMarkPt: Point = {x: falseMarkCoords[0] - 5, y: falseMarkCoords[1] + 5};
 
           markCx.drawImage(img, trueMarkPt.x, trueMarkPt.y, transformedWidth, transformedHeight, 0, 0, 32, 32);
-          const trueBrightNess = markCx.getImageData(0, 0, markCx.canvas.width, markCx.canvas.height).data.reduce((a, b) => a + b) / (32 * 32);
-          brightNesses.push(trueBrightNess);
+          const truePrediction = await this.tfEval.predict(markCx.canvas);
+          zip.file('mark' + i + '_' + markIndex + '_true.png', markCx.canvas.toDataURL().replace('data:image/png;base64,', ''), {base64: true})
 
           markCx.drawImage(img, falseMarkPt.x, falseMarkPt.y, transformedWidth, transformedHeight, 0, 0, 32, 32);
-          const falseBrightNess = markCx.getImageData(0, 0, markCx.canvas.width, markCx.canvas.height).data.reduce((a, b) => a + b) / (32 * 32);
-          brightNesses.push(falseBrightNess);
+          const falsePrediction = await this.tfEval.predict(markCx.canvas);
+          zip.file('mark' + i + '_' + markIndex + '_false.png', markCx.canvas.toDataURL().replace('data:image/png;base64,', ''), {base64: true})
 
+          trueCertainTies[i].push(truePrediction);
+          falseCertainTies[i].push(falsePrediction);
 
-          if (trueBrightNess < brightNessThreshold) {
+          if (truePrediction > 0.95) {
             cx.fillStyle = filledColor;
-            trueCertainTies[i].push(1);
           } else {
             cx.fillStyle = emptyColor;
-            trueCertainTies[i].push(0);
           }
           cx.fillRect(trueMarkPt.x, trueMarkPt.y, transformedWidth, transformedHeight);
 
-          if (falseBrightNess < brightNessThreshold) {
+          if (falsePrediction > 0.95) {
             cx.fillStyle = filledColor;
-            falseCertainTies[i].push(1);
           } else {
             cx.fillStyle = emptyColor;
-            falseCertainTies[i].push(0);
           }
           cx.fillRect(falseMarkPt.x, falseMarkPt.y, transformedWidth, transformedHeight);
           markIndex++;
         }
       }
     }
+    zip.generateAsync({type: "blob"}).then(function (content) {
+      FileSaver.saveAs(content, original.name + '.zip');
+    });
     this.batchResult.sheets[original.name] = {
       trueCheckedCertainties: trueCertainTies,
       falseCheckedCertainties: falseCertainTies
@@ -214,6 +201,7 @@ export class DocumentPreviewComponent implements OnInit {
   }
 
   async importImages(files: FileList) {
+    await this.tfEval.initialize();
     this.batchResult = {sheets: {}};
     const img: HTMLImageElement = new Image(1240, 1745);
     const canvas: HTMLCanvasElement = this.canvas.nativeElement as HTMLCanvasElement
@@ -236,6 +224,22 @@ export class DocumentPreviewComponent implements OnInit {
     return {
       width: this.canvWidth + 'px',
       height: this.canvHeight + 'px'
+    }
+  }
+
+  private markToPx(questionIndex: number, markIndex: number, truthValue: boolean): Point {
+    const xOffset =
+      50 /* marker width */ +
+      100 /* question label width */;
+    const yOffset =
+      50 /* marker height */ +
+      150 /* exam header height */ +
+      10 /* spacer height */ +
+      ((100 + 10) * questionIndex) /* previous question boxes' height + bottom margin */ +
+      20 /* label height */;
+    return {
+      x: xOffset + markIndex * 30 /* checkbox width (20) + margin (10) */,
+      y: yOffset + (truthValue ? 0 : 20) /* checkbox height (20) */
     }
   }
 

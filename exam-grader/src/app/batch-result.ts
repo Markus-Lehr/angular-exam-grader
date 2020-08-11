@@ -9,7 +9,6 @@ export interface AnswerSheetEvaluation {
   trueCheckedCertainties?: number[][];
   falseCheckedCertainties?: number[][];
   answerStates?: AnswerState[][];
-
 }
 
 export interface BatchResult {
