@@ -1,8 +1,10 @@
 :host {
-  display: block;
+  display: flex;
   position: relative;
   width: 210*5px;
   height: 297*5px;
+  background: white;
+  margin-bottom: 10px;
 }
 
 .debug-border {
@@ -10,12 +12,6 @@
 }
 
 .content-wrapper {
-  left: 10px;
-  right: 10px;
-  top: 10px;
-  bottom: 10px;
-  position: absolute;
-
   .inner-content-wrapper {
     left: 50px;
     right: 50px;
@@ -27,6 +23,25 @@
 
     .exam-header {
       height: 150px;
+      display: flex;
+      flex-direction: column;
+
+      h1 {
+        height: 30px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 5px;
+        height: 20px;
+        width: 50%;
+      }
     }
 
     .spacer {
@@ -100,3 +115,5 @@
 .aruco-bottom {
   bottom: 0;
 }
+
+

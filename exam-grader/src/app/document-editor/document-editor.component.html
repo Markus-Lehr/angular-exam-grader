@@ -1,1 +1,8 @@
-<p>document-editor works!</p>
+<button (click)="examManager.save()" [disabled]="!examManager.modified" color="primary" mat-button>Save</button>
+<mat-form-field>
+  <mat-label>Exam Name</mat-label>
+  <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.title" matInput>
+</mat-form-field>
+<button (click)="createQuestion()" mat-button>New Question</button>
+<app-question-editor *ngFor="let question of examManager.exam.questions; index as i; trackBy: trackByFn;"
+                     [index]="i" [question]="question"></app-question-editor>

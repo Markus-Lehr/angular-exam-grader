@@ -1,6 +1,8 @@
 import {Exam} from "./exam";
 
 const DEMO_EXAM: Exam = {
+  id: 'demoexam',
+  date: new Date(),
   title: 'Demo Exam',
   questions: [
     {
@@ -32,6 +34,8 @@ const DEMO_EXAM: Exam = {
 
 
 export const FULL_EXAM: Exam = {
+  id: 'fullexam',
+  date: new Date(),
   title: 'Demo Exam',
   questions: [
     {

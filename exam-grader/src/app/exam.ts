@@ -1,3 +1,8 @@
+/* not in allcaps, since these strings are lazily used as labels in a dropdown */
+export enum QuestionBlockTypes {
+  Text, Image, Subquestion
+}
+
 export interface Question {
   title?: string;
   points: number;
@@ -16,7 +21,8 @@ export interface SubQuestion {
 }
 
 export interface Exam {
+  id: string;
   title: string;
-  date?: string;
+  date: Date;
   questions: Question[];
 }

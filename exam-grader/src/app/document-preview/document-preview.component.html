@@ -1,10 +1,26 @@
-<button mat-button (click)="downloadPdf($event)">Download</button>
-<input type="file" (change)="importImages($event.target.files)" multiple>
+<button (click)="downloadPdf($event)" mat-button>Download</button>
+<input (change)="importImages($event.target.files)" multiple type="file">
 <canvas #TmpCanvas [ngStyle]="getCanvasStyle()"></canvas>
-<canvas #markAnalyzer class="mark-analyzer" width="32" height="32"></canvas>
+<canvas #markAnalyzer class="mark-analyzer" height="32" width="32"></canvas>
 <div #pages id="pages">
   <app-marking-sheet></app-marking-sheet>
-  <!--div *ngFor="let page of pageTitles" class="page">
-    <h1>{{page}}</h1>
-  </div-->
+  <ng-container *ngFor="let question of examManager.exam.questions; index as i; trackBy: trackByFn" class="page">
+    <div class="content-wrapper">
+      <app-page-header></app-page-header>
+      <div class="inner-content-wrapper">
+        <h1>Question {{i + 1}}:</h1>
+        <div *ngFor="let elem of question.elements; index as j; trackBy: trackByFn">
+          <ng-container *ngIf="isText(elem)">
+            <ng-katex-paragraph [paragraph]="elem"></ng-katex-paragraph>
+          </ng-container>
+          <img *ngIf="isImage(elem)" [src]="elem.base64string">
+          <div *ngIf="isQuestion(elem)" class="question-wrapper">
+            <span>{{examManager.getCharOfElem(question, j)}})</span>
+            <ng-katex-paragraph [paragraph]="elem.question"></ng-katex-paragraph>
+          </div>
+        </div>
+      </div>
+      <div class="space-consumer"></div>
+    </div>
+  </ng-container>
 </div>

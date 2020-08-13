@@ -9,6 +9,7 @@ import {AnswerSheetEvaluation, AnswerState, BatchResult} from "../batch-result";
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import {TensorflowCheckboxEvaluatorService} from "../tensorflow-checkbox-evaluator.service";
+import {QuestionBlock} from "../exam";
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -29,12 +30,13 @@ export class DocumentPreviewComponent implements OnInit {
   @ViewChild('TmpCanvas') canvas;
   @ViewChild('markAnalyzer') markAnalyzerCanvas;
 
-  pageTitles: string[] = ['page1', 'page2'];
   public canvWidth = leftPadding + rightPadding;
   public canvHeight = topPadding + bottomPadding
+  private
   private batchResult: BatchResult = {sheets: {}}
+  private async
 
-  constructor(private elRef: ElementRef, private examManager: ExamManagerService, private tfEval: TensorflowCheckboxEvaluatorService) {
+  constructor(private elRef: ElementRef, public examManager: ExamManagerService, private tfEval: TensorflowCheckboxEvaluatorService) {
   }
 
   private static flattenPoints(pts: Point[]): number[] {
@@ -227,7 +229,31 @@ export class DocumentPreviewComponent implements OnInit {
     }
   }
 
-  private markToPx(questionIndex: number, markIndex: number, truthValue: boolean): Point {
+  isText = (elem: QuestionBlock) => {
+    return typeof elem === "string";
+  }
+
+  isImage = (elem: QuestionBlock) => {
+    return typeof elem === "object" && 'base64string' in elem;
+  }
+
+  isQuestion = (elem: QuestionBlock) => {
+    return typeof elem === "object" && 'question' in elem;
+  }
+
+  trackByFn(index, item) {
+    return index;
+  }
+
+  markToPx(questionIndex
+             :
+             number, markIndex
+             :
+             number, truthValue
+             :
+             boolean
+  ):
+    Point {
     const xOffset =
       50 /* marker width */ +
       100 /* question label width */;
@@ -243,7 +269,10 @@ export class DocumentPreviewComponent implements OnInit {
     }
   }
 
-  private async evaluateSheet(sheet: AnswerSheetEvaluation) {
+  evaluateSheet(sheet
+                  :
+                  AnswerSheetEvaluation
+  ) {
     sheet.answerStates = []
     for (let i = 0; i < this.examManager.exam.questions.length; i++) {
       sheet.answerStates.push([])
