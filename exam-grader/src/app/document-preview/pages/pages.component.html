@@ -1,0 +1,25 @@
+<app-pages class="inner-pages" (questionSizes)="compactPages($event)" *ngIf="autoCompact" [autoCompact]="false"></app-pages>
+
+<ng-container *ngFor="let page of pages(); index as i; trackBy: trackByFn" class="page">
+  <div class="content-wrapper">
+    <app-page-header></app-page-header>
+    <div class="inner-content-wrapper">
+      <ng-container *ngFor="let question of page; index as j; trackBy: trackByFn" class="page">
+        <div [class]="autoCompact ? 'question-body-wrapper' : 'question-body-wrapper-selector'">
+          <h1>Question {{getQuestionNumber(i, j)}}:</h1>
+          <div *ngFor="let elem of question.elements; index as k; trackBy: trackByFn">
+            <ng-container *ngIf="isText(elem)">
+              <ng-katex-paragraph [paragraph]="elem"></ng-katex-paragraph>
+            </ng-container>
+            <img *ngIf="isImage(elem)" [src]="elem.base64string">
+            <div *ngIf="isQuestion(elem)" class="prompt-wrapper">
+              <span>{{examManager.getCharOfElem(question, k)}})</span>
+              <ng-katex-paragraph [paragraph]="elem.question"></ng-katex-paragraph>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="space-consumer"></div>
+  </div>
+</ng-container>

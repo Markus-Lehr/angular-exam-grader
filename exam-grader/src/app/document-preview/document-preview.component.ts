@@ -9,7 +9,6 @@ import {AnswerSheetEvaluation, AnswerState, BatchResult} from "../batch-result";
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import {TensorflowCheckboxEvaluatorService} from "../tensorflow-checkbox-evaluator.service";
-import {QuestionBlock} from "../exam";
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -27,6 +26,7 @@ const emptyColor = "rgba(0, 0, 200, .2)";
 })
 export class DocumentPreviewComponent implements OnInit {
   @ViewChild('pages') pages;
+  @ViewChild('markingSheet', { read: ElementRef }) markingSheet: ElementRef;
   @ViewChild('TmpCanvas') canvas;
   @ViewChild('markAnalyzer') markAnalyzerCanvas;
 
@@ -57,21 +57,28 @@ export class DocumentPreviewComponent implements OnInit {
   async downloadPdf(event: MouseEvent) {
     console.log('downloading pdf');
     let pdf = new jsPDF();
-    const pageRefs: HTMLCollection = this.pages.nativeElement.children;
-    var svgElements = document.body.querySelectorAll('svg');
-    svgElements.forEach(function(item) {
+    // preprocess svg elements for fixing problems between katex and html2canvas
+    const svgElements = document.body.querySelectorAll('svg');
+    svgElements.forEach(function (item) {
       item.setAttribute("width", String(item.getBoundingClientRect().width));
       item.style.width = null;
     });
-    for (let i = 0; i < pageRefs.length; i++) {
-      const pageRef = pageRefs.item(i) as HTMLElement;
+    console.log(this.markingSheet);
+    const pageRefs: HTMLElement[] = [this.markingSheet.nativeElement]
+      .concat(Array.prototype.slice.call(this.pages.elem.nativeElement.children, 0));
+    console.log(pageRefs);
+
+    for (let i = 0; i < pageRefs.length; i++){
+      let pageRef = pageRefs[i];
+      if (pageRef.nodeName === 'APP-PAGES') {
+        continue;
+      }
       const canvas = await html2canvas(pageRef, {removeContainer: true, scale: 2});
       const contentDataURL = canvas.toDataURL('image/jpeg');
       if (i > 0) {
         pdf.addPage();
       }
       pdf.setPage(i + 1);
-      //pdf.text('Hello World', 10, 10);
       await pdf.addImage(contentDataURL, 'JPEG', 0, 0, 210, 297);
     }
     pdf.save('test.pdf');
@@ -234,30 +241,7 @@ export class DocumentPreviewComponent implements OnInit {
     }
   }
 
-  isText = (elem: QuestionBlock) => {
-    return typeof elem === "string";
-  }
-
-  isImage = (elem: QuestionBlock) => {
-    return typeof elem === "object" && 'base64string' in elem;
-  }
-
-  isQuestion = (elem: QuestionBlock) => {
-    return typeof elem === "object" && 'question' in elem;
-  }
-
-  trackByFn(index, item) {
-    return index;
-  }
-
-  markToPx(questionIndex
-             :
-             number, markIndex
-             :
-             number, truthValue
-             :
-             boolean
-  ):
+  markToPx(questionIndex: number, markIndex: number, truthValue: boolean):
     Point {
     const xOffset =
       50 /* marker width */ +
@@ -274,10 +258,7 @@ export class DocumentPreviewComponent implements OnInit {
     }
   }
 
-  evaluateSheet(sheet
-                  :
-                  AnswerSheetEvaluation
-  ) {
+  evaluateSheet(sheet: AnswerSheetEvaluation) {
     sheet.answerStates = []
     for (let i = 0; i < this.examManager.exam.questions.length; i++) {
       sheet.answerStates.push([])

@@ -76,8 +76,6 @@ export class ExamManagerService {
   }
 
   public calculateMarkPositions(): Point[][] {
-    console.log('calculating mark positions.')
-
     let pts: Point[][] = [];
     for (let i = 0; i < this.exam.questions.length; i++) {
       const question = this.exam.questions[i];
@@ -93,7 +91,6 @@ export class ExamManagerService {
       }
       pts.push(questionPoints);
     }
-    console.log(pts);
     return pts;
   }
 
