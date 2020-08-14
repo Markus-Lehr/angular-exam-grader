@@ -15,7 +15,7 @@ export class DocumentEditorComponent implements OnInit {
 
   createQuestion() {
     this.examManager.exam.questions.push({
-      elements: ['Your question body goes here (with Latex)'],
+      elements: ['Your question body goes here'],
       points: 5});
     this.examManager.modified = true;
   }

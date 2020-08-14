@@ -53,6 +53,7 @@ export class ElementEditorComponent implements OnInit {
 
   remove() {
     this.examManager.modified = true;
+    this.question.elements.splice(this.elementIndex, 1);
   }
 
   changeType(value: any) {
@@ -64,7 +65,7 @@ export class ElementEditorComponent implements OnInit {
     }
     switch (enumValue) {
       case this.types.Text:
-        this.question.elements[this.elementIndex] = 'Your text goes here';
+        this.question.elements[this.elementIndex] = '';
         break;
       case this.types.Image:
         this.question.elements[this.elementIndex] = {
@@ -73,7 +74,7 @@ export class ElementEditorComponent implements OnInit {
         break;
       default:
         this.question.elements[this.elementIndex] = {
-          answer: false, question: 'How are you?'
+          answer: false, question: undefined
         };
     }
     this.examManager.modified = true;

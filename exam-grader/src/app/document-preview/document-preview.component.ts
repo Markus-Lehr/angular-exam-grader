@@ -58,6 +58,11 @@ export class DocumentPreviewComponent implements OnInit {
     console.log('downloading pdf');
     let pdf = new jsPDF();
     const pageRefs: HTMLCollection = this.pages.nativeElement.children;
+    var svgElements = document.body.querySelectorAll('svg');
+    svgElements.forEach(function(item) {
+      item.setAttribute("width", String(item.getBoundingClientRect().width));
+      item.style.width = null;
+    });
     for (let i = 0; i < pageRefs.length; i++) {
       const pageRef = pageRefs.item(i) as HTMLElement;
       const canvas = await html2canvas(pageRef, {removeContainer: true, scale: 2});

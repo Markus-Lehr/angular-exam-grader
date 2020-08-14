@@ -31,7 +31,7 @@ export class QuestionEditorComponent implements OnInit {
   }
 
   addElement() {
-    this.question.elements.push('Some more text');
+    this.question.elements.push({question: undefined, answer: false});
   }
 
   collapse() {

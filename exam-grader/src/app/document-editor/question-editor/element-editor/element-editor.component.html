@@ -11,7 +11,6 @@
         <mat-label>Question Text</mat-label>
         <textarea matInput [(ngModel)]="question.elements[elementIndex]"></textarea>
       </mat-form-field>
-      <span>{{question.elements[elementIndex]}}</span>
     </ng-container>
     <ng-container *ngSwitchCase="types.Image">
       <span>An image:</span>
@@ -28,6 +27,6 @@
   <mat-card-actions>
     <button mat-button (click)="move(-1)">Move up</button>
     <button mat-button (click)="move(1)">Move down</button>
-    <button mat-button>Remove</button>
+    <button mat-button (click)="remove()">Remove</button>
   </mat-card-actions>
 </mat-card>
