@@ -28,6 +28,8 @@ import { EvaluatorComponent } from './evaluator/evaluator.component';
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatListModule} from "@angular/material/list";
 import {MatTabsModule} from "@angular/material/tabs";
+import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 
 @NgModule({
@@ -44,7 +46,8 @@ import {MatTabsModule} from "@angular/material/tabs";
     PagesComponent,
     PageFooterComponent,
     EvaluatorComponent,
-    DocumentDownloadDialog
+    DocumentDownloadDialog,
+    LoadingScreenComponent
   ],
   imports: [
     BrowserModule,
@@ -62,7 +65,8 @@ import {MatTabsModule} from "@angular/material/tabs";
     KatexModule,
     MatDialogModule,
     MatListModule,
-    MatTabsModule
+    MatTabsModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -8,6 +8,8 @@ import * as JSZip from "jszip";
 import {AR} from "js-aruco";
 import * as FileSaver from 'file-saver';
 import PerspT from "perspective-transform";
+import {PointCalculatorService} from "../point-calculator.service";
+import {LoadingService} from "../loading-screen/loading.service";
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -33,7 +35,11 @@ export class EvaluatorComponent implements OnInit {
   private canvWidth = leftPadding + rightPadding;
   private canvHeight = topPadding + bottomPadding;
 
-  constructor(private route: ActivatedRoute, private examManager: ExamManagerService, private tfEval: TensorflowCheckboxEvaluatorService) {
+  constructor(private route: ActivatedRoute,
+              private examManager: ExamManagerService,
+              private tfEval: TensorflowCheckboxEvaluatorService,
+              private pointCalculator: PointCalculatorService,
+              private loading: LoadingService) {
   }
 
   private static flattenPoints(pts: Point[]): number[] {
@@ -51,6 +57,7 @@ export class EvaluatorComponent implements OnInit {
   }
 
   async importFiles(files: FileList) {
+    this.loading.show = true;
     console.log(files);
     await this.tfEval.initialize();
     this.batchResult = {sheets: {}};
@@ -76,6 +83,7 @@ export class EvaluatorComponent implements OnInit {
     for (const sheet of Object.keys(this.batchResult.sheets)) {
       await this.evaluateSheet(this.batchResult.sheets[sheet]);
     }
+    this.loading.show = false;
     console.log(this.batchResult);
   }
 
@@ -280,5 +288,6 @@ export class EvaluatorComponent implements OnInit {
         }
       }
     }
+    this.pointCalculator.calculatePoints(sheet);
   }
 }

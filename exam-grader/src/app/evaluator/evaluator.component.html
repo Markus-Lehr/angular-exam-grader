@@ -18,7 +18,17 @@
     </div>
   </mat-tab>
   <mat-tab label="Processed">
-    <app-marking-sheet [evaluation]="batchResult.sheets[fileSelectionList.selectedOptions.selected[0]?.value]"></app-marking-sheet>
+    <app-marking-sheet
+      [evaluation]="batchResult.sheets[fileSelectionList.selectedOptions.selected[0]?.value]"></app-marking-sheet>
   </mat-tab>
-  <mat-tab label="Results">Content 3</mat-tab>
+  <mat-tab label="Results">
+    <ng-container *ngIf="fileSelectionList.selectedOptions.selected[0]?.value
+    && batchResult.sheets[fileSelectionList.selectedOptions.selected[0]?.value].individualPoints"
+                  class="existence-wrapper">
+      <div
+        *ngFor="let pt of batchResult.sheets[fileSelectionList.selectedOptions.selected[0]?.value].individualPoints; index as i">
+        <label>Question {{i + 1}}: {{pt}} pts</label>
+      </div>
+    </ng-container>
+  </mat-tab>
 </mat-tab-group>

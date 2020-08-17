@@ -13,6 +13,8 @@ export interface AnswerSheetEvaluation {
   trueCheckedCertainties?: number[][];
   falseCheckedCertainties?: number[][];
   answerStates?: AnswerState[][];
+  individualPoints?: number[];
+  cumulatedPoints?: number;
   processingState: ProcessingState;
 }
 
