@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
-import {Exam, Question, SubQuestion} from "./exam";
+import {Exam, Question} from "./exam";
 import {Point} from "@angular/cdk/drag-drop";
 import {FULL_EXAM} from "./test-exams";
+import * as FileSaver from 'file-saver';
 
 const demoExam: Exam = FULL_EXAM
 
@@ -18,7 +19,10 @@ export class ExamManagerService {
   public horizontalLabelOffset = 100;
   public horizontalMarkOffset = this.horizontalLabelOffset + 100;
 
+  private fileReader: FileReader;
+
   constructor() {
+    this.fileReader = new FileReader();
   }
 
 
@@ -59,7 +63,7 @@ export class ExamManagerService {
 
   public getCharOfElem(question: Question, elemNr: number): string {
     let index: number = 0;
-    for (let i = 0; i < question.elements.length; i++){
+    for (let i = 0; i < question.elements.length; i++) {
       if (i === elemNr) {
         return this.getChar(index);
       }
@@ -73,6 +77,16 @@ export class ExamManagerService {
 
   public getChar(charNum: number): string {
     return String.fromCharCode('a'.charCodeAt(0) + charNum);
+  }
+
+  public realMarks(question: Question): boolean[] {
+    let markResults: boolean[] = [];
+    for (const element of question.elements) {
+      if (typeof element === 'object' && 'question' in element) {
+        markResults.push(element.answer);
+      }
+    }
+    return markResults;
   }
 
   public calculateMarkPositions(): Point[][] {
@@ -104,6 +118,30 @@ export class ExamManagerService {
   public save() {
     localStorage.setItem(this.exam.id, JSON.stringify(this.exam));
     this.modified = false;
+  }
+
+  export(event: MouseEvent) {
+    const examBytes: Uint8Array = new TextEncoder().encode(JSON.stringify(this.exam));
+    const blob = new Blob([examBytes], {
+      type: 'application/json;charset=utf-8'
+    });
+    FileSaver.saveAs(blob, this.exam.title + '.json');
+  }
+
+  import(files: FileList) {
+    if (files.length !== 1) {
+      return;
+    }
+    const file: File = files.item(0);
+    console.log(file);
+    this.fileReader.onload = (contentWrapper => {
+      const result = contentWrapper.target.result;
+      if (result && typeof result === "string") {
+        this.exam = JSON.parse(result);
+        this.modified = true;
+      }
+    });
+    this.fileReader.readAsText(file);
   }
 
   private generateNewExam(examId: string) {

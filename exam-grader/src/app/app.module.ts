@@ -23,6 +23,7 @@ import {MatSelectModule} from "@angular/material/select";
 import { KatexModule } from 'ng-katex';
 import { PageHeaderComponent } from './document-preview/page-header/page-header.component';
 import { PagesComponent } from './document-preview/pages/pages.component';
+import { PageFooterComponent } from './document-preview/page-footer/page-footer.component';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { PagesComponent } from './document-preview/pages/pages.component';
     QuestionEditorComponent,
     ElementEditorComponent,
     PageHeaderComponent,
-    PagesComponent
+    PagesComponent,
+    PageFooterComponent
   ],
   imports: [
     BrowserModule,

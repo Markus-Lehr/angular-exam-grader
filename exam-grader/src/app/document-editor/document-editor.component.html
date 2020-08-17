@@ -1,11 +1,16 @@
-<button (click)="examManager.save()" [disabled]="!examManager.modified" color="primary" mat-button>Save</button>
+<input #uploadJsonInput hidden (change)="examManager.import($event.target.files)" type="file">
+<div class="buttons">
+  <button (click)="examManager.save()" [disabled]="!examManager.modified" color="primary" mat-raised-button>Save</button>
+  <button (click)="examManager.export($event)" mat-raised-button>Export .json</button>
+  <button (click)="uploadJsonInput.click()" mat-raised-button>Import .json</button>
+</div>
 <mat-form-field>
   <mat-label>Exam Name</mat-label>
   <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.title" matInput>
 </mat-form-field>
 <mat-form-field>
   <mat-label>Exam Date</mat-label>
-  <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.date" type="date" matInput>
+  <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.date" matInput type="date">
 </mat-form-field>
 <button (click)="createQuestion()" mat-button>New Question</button>
 <app-question-editor *ngFor="let question of examManager.exam.questions; index as i; trackBy: trackByFn;"

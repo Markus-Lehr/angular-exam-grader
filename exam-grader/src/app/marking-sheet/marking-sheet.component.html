@@ -5,6 +5,7 @@
   <div #bottomRightArucoMarker class="aruco-marker aruco-bottom aruco-right"></div>
 
   <div class="inner-content-wrapper debug-border">
+    <label class="sample-solution-warning" *ngIf="sampleSolution">SAMPLE</label>
     <div class="exam-header debug-border">
       <h1>{{examManager.exam.title}}, {{examManager.exam.date | date}}</h1>
       <table>
@@ -22,17 +23,17 @@
     <div class="mark-container debug-border">
       <div class="question-labels debug-border">
         <div *ngFor="let question of examManager.exam.questions; index as i" class="question-row debug-border">
-          <label>Question {{i + 1}}:</label>
-          <label>True</label>
-          <label>False</label>
-        </div>
-      </div>
-      <div class="marks debug-border">
-        <div *ngFor="let markRow of examManager.calculateMarkPositions(); index as i" class="mark-slices debug-border">
-          <div *ngFor="let coord of markRow; index as j" class="mark-slice">
-            <label>({{examManager.getChar(j)}})</label>
-            <mat-checkbox></mat-checkbox>
-            <mat-checkbox></mat-checkbox>
+          <div class="question-label">
+            <label>Question {{i + 1}}:</label>
+            <label>True</label>
+            <label>False</label>
+          </div>
+          <div class="mark-slices">
+            <div *ngFor="let mark of examManager.realMarks(question); index as j" class="mark-slice">
+              <label>({{examManager.getChar(j)}})</label>
+              <mat-checkbox disabled [checked]="sampleSolution && mark"></mat-checkbox>
+              <mat-checkbox disabled [checked]="sampleSolution && !mark"></mat-checkbox>
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {Point} from "@angular/cdk/drag-drop";
 import {ExamManagerService} from "../exam-manager.service";
 import ArucoMarker from "aruco-marker";
@@ -14,6 +14,8 @@ export class MarkingSheetComponent implements OnInit, AfterViewInit {
   @ViewChild('bottomLeftArucoMarker') bottomLeftArucoMarker;
   @ViewChild('bottomRightArucoMarker') bottomRightArucoMarker;
 
+  @Input()
+  sampleSolution: boolean = false;
 
   constructor(public examManager: ExamManagerService) {
   }

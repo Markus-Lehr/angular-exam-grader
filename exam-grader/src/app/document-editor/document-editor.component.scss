@@ -5,3 +5,15 @@
   width: 30%;
   overflow-x: hidden;
 }
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+* {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
