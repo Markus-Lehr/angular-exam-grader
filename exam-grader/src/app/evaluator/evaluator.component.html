@@ -1,0 +1,34 @@
+<div class="management-wrapper">
+  <input #fileInput (change)="importFiles($event.target.files)" multiple type="file" accept="image/*" style="display: none">
+  <button mat-raised-button (click)="fileInput.click()"> Import Files</button>
+  <mat-selection-list [multiple]="false">
+    <mat-list-option>
+      <mat-icon class="file-state-icon" mat-list-icon>folder</mat-icon>
+      <div mat-line>File 1</div>
+      <div mat-line>01426019</div>
+    </mat-list-option>
+    <mat-list-option>
+      <mat-icon class="file-state-icon" mat-list-icon>folder</mat-icon>
+      <div mat-line>File 2</div>
+      <div mat-line>01426019</div>
+    </mat-list-option>
+    <mat-list-option>
+      <mat-icon class="file-state-icon" mat-list-icon>folder</mat-icon>
+      <div mat-line>File 3</div>
+      <div mat-line>01426019</div>
+    </mat-list-option>
+    <mat-list-option>
+      <mat-icon class="file-state-icon" mat-list-icon>folder</mat-icon>
+      <div mat-line>File 4</div>
+      <div mat-line>01426019</div>
+    </mat-list-option>
+  </mat-selection-list>
+</div>
+<mat-tab-group animationDuration="0ms" class="visual-container">
+  <mat-tab label="Canvas">
+    <canvas #MainAnalysisCanvas [ngStyle]="getCanvasStyle()"></canvas>
+    <canvas #SingleMarkAnalysisCanvas class="mark-analyzer" height="32" width="32"></canvas>
+  </mat-tab>
+  <mat-tab label="Processed">Content 2</mat-tab>
+  <mat-tab label="Results">Content 3</mat-tab>
+</mat-tab-group>

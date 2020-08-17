@@ -5,6 +5,7 @@
   height: 297*5px;
   background: white;
   margin-bottom: 10px;
+  z-index: -10;
 }
 
 .debug-border {
@@ -25,12 +26,13 @@
       position: absolute;
       top: 50%;
       font-size: 100pt;
-      color: palevioletred;
+      color: #fcd9d9;
       text-align: center;
       align-items: center;
       align-self: center;
       width: 100%;
       height: 100%;
+      z-index: -5;
     }
 
     .exam-header {

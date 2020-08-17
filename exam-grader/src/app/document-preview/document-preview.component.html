@@ -1,7 +1,4 @@
-<button (click)="downloadPdf($event)" mat-button>Download</button>
-<input (change)="importImages($event.target.files)" multiple type="file">
-<canvas #TmpCanvas [ngStyle]="getCanvasStyle()"></canvas>
-<canvas #markAnalyzer class="mark-analyzer" height="32" width="32"></canvas>
+<button (click)="openDialog()" mat-button>Download</button>
 <div class="page-container">
   <app-marking-sheet #markingSheet></app-marking-sheet>
   <app-marking-sheet #sampleSheet sampleSolution="true"></app-marking-sheet>

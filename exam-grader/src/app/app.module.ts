@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { DocumentPreviewComponent } from './document-preview/document-preview.component';
+import {DocumentDownloadDialog, DocumentPreviewComponent} from './document-preview/document-preview.component';
 import { DocumentEditorComponent } from './document-editor/document-editor.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatButtonModule} from "@angular/material/button";
@@ -24,6 +24,10 @@ import { KatexModule } from 'ng-katex';
 import { PageHeaderComponent } from './document-preview/page-header/page-header.component';
 import { PagesComponent } from './document-preview/pages/pages.component';
 import { PageFooterComponent } from './document-preview/page-footer/page-footer.component';
+import { EvaluatorComponent } from './evaluator/evaluator.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatListModule} from "@angular/material/list";
+import {MatTabsModule} from "@angular/material/tabs";
 
 
 @NgModule({
@@ -38,7 +42,9 @@ import { PageFooterComponent } from './document-preview/page-footer/page-footer.
     ElementEditorComponent,
     PageHeaderComponent,
     PagesComponent,
-    PageFooterComponent
+    PageFooterComponent,
+    EvaluatorComponent,
+    DocumentDownloadDialog
   ],
   imports: [
     BrowserModule,
@@ -53,7 +59,10 @@ import { PageFooterComponent } from './document-preview/page-footer/page-footer.
     FormsModule,
     MatCardModule,
     MatSelectModule,
-    KatexModule
+    KatexModule,
+    MatDialogModule,
+    MatListModule,
+    MatTabsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
