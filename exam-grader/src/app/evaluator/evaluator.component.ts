@@ -29,6 +29,8 @@ const inverseThreshold = 1 - certaintyThreshold;
 })
 export class EvaluatorComponent implements OnInit {
   @ViewChild('MainAnalysisCanvas') mainCanvas;
+  @ViewChild('NameAnalysisCanvas') nameCanvas;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas') immatriculationCanvas;
   @ViewChild('SingleMarkAnalysisCanvas') markAnalyzerCanvas;
   public batchResult: BatchResult = {sheets: {}};
   public sheetNames: string[] = [];
