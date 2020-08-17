@@ -35,3 +35,9 @@
 .space-consumer {
   flex: 1;
 }
+
+.dialog-content {
+  height: 79%;
+  display: flex;
+  flex-direction: column;
+}

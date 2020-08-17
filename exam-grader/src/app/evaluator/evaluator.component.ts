@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {ExamManagerService} from "../exam-manager.service";
 import {TensorflowCheckboxEvaluatorService} from "../tensorflow-checkbox-evaluator.service";
-import {AnswerSheetEvaluation, AnswerState, BatchResult} from "../batch-result";
+import {AnswerSheetEvaluation, AnswerState, BatchResult, ProcessingState} from "../batch-result";
 import {Point} from "@angular/cdk/drag-drop";
 import * as JSZip from "jszip";
 import {AR} from "js-aruco";
@@ -17,6 +17,8 @@ const a4width = 210 * 5 - 2 * 10 /* white padding */;
 const a4height = 297 * 5 - 2 * 10 /* white padding*/;
 const filledColor = "rgba(0, 200, 200, .3)";
 const emptyColor = "rgba(0, 0, 200, .2)";
+const certaintyThreshold = 0.98; /* the certainty threshold needs to be exceeded in order for the library to be trusted */
+const inverseThreshold = 1 - certaintyThreshold;
 
 @Component({
   selector: 'app-evaluator',
@@ -26,9 +28,10 @@ const emptyColor = "rgba(0, 0, 200, .2)";
 export class EvaluatorComponent implements OnInit {
   @ViewChild('MainAnalysisCanvas') mainCanvas;
   @ViewChild('SingleMarkAnalysisCanvas') markAnalyzerCanvas;
-  public canvWidth = leftPadding + rightPadding;
-  public canvHeight = topPadding + bottomPadding;
-  private batchResult: BatchResult = {sheets: {}}
+  public batchResult: BatchResult = {sheets: {}};
+  public sheetNames: string[] = [];
+  private canvWidth = leftPadding + rightPadding;
+  private canvHeight = topPadding + bottomPadding;
 
   constructor(private route: ActivatedRoute, private examManager: ExamManagerService, private tfEval: TensorflowCheckboxEvaluatorService) {
   }
@@ -51,12 +54,20 @@ export class EvaluatorComponent implements OnInit {
     console.log(files);
     await this.tfEval.initialize();
     this.batchResult = {sheets: {}};
+    this.sheetNames = [];
     const img: HTMLImageElement = new Image(1240, 1745);
     const canvas: HTMLCanvasElement = this.mainCanvas.nativeElement as HTMLCanvasElement
     const cx: CanvasRenderingContext2D = canvas.getContext('2d');
 
     canvas.width = leftPadding + rightPadding;
     canvas.height = topPadding + bottomPadding;
+    // init results object
+    for (let i = 0; i < files.length; i++) {
+      const file: File = files.item(i);
+      this.batchResult.sheets[file.name] = {processingState: ProcessingState.NOT_STARTED};
+      this.sheetNames.push(file.name);
+    }
+
     for (let i = 0; i < files.length; i++) {
       const file: File = files.item(i);
       await this.addImageSrc(img, URL.createObjectURL(file));
@@ -70,10 +81,10 @@ export class EvaluatorComponent implements OnInit {
 
   markToPx(questionIndex: number, markIndex: number, truthValue: boolean): Point {
     let nextCol: boolean = false;
-    if (questionIndex > 9) {
+    if (questionIndex > 8) {
       nextCol = true;
-      questionIndex -= 10;
-    } else if (questionIndex > 19) {
+      questionIndex -= 9;
+    } else if (questionIndex > 18) {
       console.warn('probably to many different questions; cant comprehend questionIndex:', questionIndex);
       return undefined;
     }
@@ -93,10 +104,20 @@ export class EvaluatorComponent implements OnInit {
     }
   }
 
-  public getCanvasStyle(): any {
-    return {
-      width: this.canvWidth + 'px',
-      height: this.canvHeight + 'px'
+  iconForFile(file: string): string {
+    if (this.batchResult.sheets[file].processingState === ProcessingState.NOT_STARTED) {
+      return 'not_started';
+    }
+    if (this.batchResult.sheets[file].processingState === ProcessingState.WORKING) {
+      return 'pending';
+    }
+    if (this.batchResult.sheets[file].processingState === ProcessingState.DONE) {
+      return 'offline_pin';
+    }
+    if (this.batchResult.sheets[file].processingState === ProcessingState.MANUAL_INTERVENTION_NECESSARY) {
+      return 'offline_bolt';
+    } else {
+      return 'offline_bolt';
     }
   }
 
@@ -153,6 +174,7 @@ export class EvaluatorComponent implements OnInit {
   }
 
   private async processImage(img: HTMLImageElement, cx: CanvasRenderingContext2D, original: File) {
+    this.batchResult.sheets[original.name].processingState = ProcessingState.WORKING;
     const sourceCorners: Point[] = [
       {x: 0, y: 0},
       {x: a4width, y: 0},
@@ -204,14 +226,14 @@ export class EvaluatorComponent implements OnInit {
           trueCertainTies[i].push(truePrediction);
           falseCertainTies[i].push(falsePrediction);
 
-          if (truePrediction > 0.95) {
+          if (truePrediction > certaintyThreshold) {
             cx.fillStyle = filledColor;
           } else {
             cx.fillStyle = emptyColor;
           }
           cx.fillRect(trueMarkPt.x, trueMarkPt.y, transformedWidth, transformedHeight);
 
-          if (falsePrediction > 0.95) {
+          if (falsePrediction > certaintyThreshold) {
             cx.fillStyle = filledColor;
           } else {
             cx.fillStyle = emptyColor;
@@ -224,10 +246,9 @@ export class EvaluatorComponent implements OnInit {
     zip.generateAsync({type: "blob"}).then(function (content) {
       FileSaver.saveAs(content, original.name + '.zip');
     });
-    this.batchResult.sheets[original.name] = {
-      trueCheckedCertainties: trueCertainTies,
-      falseCheckedCertainties: falseCertainTies
-    }
+    this.batchResult.sheets[original.name].trueCheckedCertainties = trueCertainTies;
+    this.batchResult.sheets[original.name].falseCheckedCertainties = falseCertainTies;
+    this.batchResult.sheets[original.name].processingState = ProcessingState.DONE;
   }
 
   private evaluateSheet(sheet: AnswerSheetEvaluation) {
@@ -238,15 +259,15 @@ export class EvaluatorComponent implements OnInit {
       let markIndex = 0;
       for (const element of question.elements) {
         if (typeof element === 'object' && 'question' in element) {
-          if (sheet.trueCheckedCertainties[i][markIndex] === 1 && sheet.falseCheckedCertainties[i][markIndex] === 1) {
+          if (sheet.trueCheckedCertainties[i][markIndex] >= certaintyThreshold && sheet.falseCheckedCertainties[i][markIndex] >= certaintyThreshold) {
             sheet.answerStates[i].push(AnswerState.WRONG);
-          } else if (sheet.trueCheckedCertainties[i][markIndex] === 0 && sheet.falseCheckedCertainties[i][markIndex] === 0) {
+          } else if (sheet.trueCheckedCertainties[i][markIndex] <= inverseThreshold && sheet.falseCheckedCertainties[i][markIndex] <= inverseThreshold) {
             sheet.answerStates[i].push(AnswerState.EMPTY);
           } else {
             let answer: boolean = undefined;
-            if (sheet.trueCheckedCertainties[i][markIndex] === 1) {
+            if (sheet.trueCheckedCertainties[i][markIndex] >= certaintyThreshold) {
               answer = true;
-            } else if (sheet.falseCheckedCertainties[i][markIndex] === 1) {
+            } else if (sheet.falseCheckedCertainties[i][markIndex] >= certaintyThreshold) {
               answer = false;
             }
             if (answer === element.answer) {
@@ -260,5 +281,4 @@ export class EvaluatorComponent implements OnInit {
       }
     }
   }
-
 }

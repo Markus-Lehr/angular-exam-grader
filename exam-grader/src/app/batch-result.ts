@@ -1,5 +1,9 @@
 export enum AnswerState {
-  CORRECT, WRONG, EMPTY
+  CORRECT, WRONG, EMPTY, MANUAL_INTERVENTION_NECESSARY
+}
+
+export enum ProcessingState {
+  NOT_STARTED, WORKING, DONE, MANUAL_INTERVENTION_NECESSARY
 }
 
 export interface AnswerSheetEvaluation {
@@ -9,6 +13,7 @@ export interface AnswerSheetEvaluation {
   trueCheckedCertainties?: number[][];
   falseCheckedCertainties?: number[][];
   answerStates?: AnswerState[][];
+  processingState: ProcessingState;
 }
 
 export interface BatchResult {

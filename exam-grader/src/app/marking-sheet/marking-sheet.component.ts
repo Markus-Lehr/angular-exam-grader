@@ -1,7 +1,8 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
-import {Point} from "@angular/cdk/drag-drop";
 import {ExamManagerService} from "../exam-manager.service";
 import ArucoMarker from "aruco-marker";
+import {AnswerSheetEvaluation, AnswerState} from "../batch-result";
+import {ThemePalette} from "@angular/material/core";
 
 @Component({
   selector: 'app-marking-sheet',
@@ -16,6 +17,8 @@ export class MarkingSheetComponent implements OnInit, AfterViewInit {
 
   @Input()
   sampleSolution: boolean = false;
+  @Input()
+  evaluation: AnswerSheetEvaluation = undefined;
 
   constructor(public examManager: ExamManagerService) {
   }
@@ -30,4 +33,31 @@ export class MarkingSheetComponent implements OnInit, AfterViewInit {
     this.bottomRightArucoMarker.nativeElement.innerHTML = new ArucoMarker(4).toSVG('50px');
   }
 
+  answerState(questionIndex: number, markIndex: number): AnswerState {
+    return this.evaluation.answerStates[questionIndex][markIndex];
+  }
+
+  getChecked(questionIndex: number, markIndex: number, correctValue: boolean, currentTruthValue: boolean): boolean {
+    if (this.evaluation) {
+      const state = this.answerState(questionIndex, markIndex);
+      return (state === AnswerState.CORRECT && correctValue === currentTruthValue) ||
+        (state === AnswerState.WRONG && correctValue !== currentTruthValue);
+    } else {
+      return this.sampleSolution && (currentTruthValue === correctValue);
+    }
+  }
+
+  getColor(questionIndex: number, markIndex: number): ThemePalette {
+    if (!this.evaluation) {
+      return 'primary';
+    }
+    const state = this.answerState(questionIndex, markIndex);
+    if (state === AnswerState.CORRECT) {
+      return 'primary';
+    } else if (state === AnswerState.WRONG) {
+      return 'warn';
+    } else {
+      return 'accent';
+    }
+  }
 }

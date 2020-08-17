@@ -28,6 +28,7 @@ const emptyColor = "rgba(0, 0, 200, .2)";
 export class DocumentPreviewComponent implements OnInit {
   @ViewChild('pages') pages;
   @ViewChild('markingSheet', { read: ElementRef }) markingSheet: ElementRef;
+  @ViewChild('sampleSheet', { read: ElementRef }) sampleSheet: ElementRef;
 
   public canvWidth = leftPadding + rightPadding;
   public canvHeight = topPadding + bottomPadding;
@@ -51,7 +52,7 @@ export class DocumentPreviewComponent implements OnInit {
     await new Promise(resolve => setTimeout(resolve, 1000 * s));
   }
 
-  async downloadPdf(event: MouseEvent) {
+  async downloadPdf(event: MouseEvent, result: DownloadDialogData) {
     console.log('downloading pdf');
     let pdf = new jsPDF();
     // preprocess svg elements for fixing problems between katex and html2canvas
@@ -61,8 +62,20 @@ export class DocumentPreviewComponent implements OnInit {
       item.style.width = null;
     });
     console.log(this.markingSheet);
-    const pageRefs: HTMLElement[] = [this.markingSheet.nativeElement]
-      .concat(Array.prototype.slice.call(this.pages.elem.nativeElement.children, 0));
+    if (result.onePdf === false) {
+      console.warn('We cannot produce different pdfs yet. Don\'t choose merge pdf.');
+      return;
+    }
+    let pageRefs: HTMLElement[] = [];
+    if (result.markSheet) {
+      pageRefs.push(this.markingSheet.nativeElement);
+    }
+    if (result.sampleSheet) {
+      pageRefs.push(this.sampleSheet.nativeElement);
+    }
+    if (result.exam) {
+      pageRefs.push(Array.prototype.slice.call(this.pages.elem.nativeElement.children, 0));
+    }
     console.log(pageRefs);
 
     for (let i = 0; i < pageRefs.length; i++){
@@ -83,13 +96,17 @@ export class DocumentPreviewComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DocumentDownloadDialog, {
-      width: '250px',
-      data: {markSheet: true, sampleSheet: true, exam: true, onePdf: true}
+      width: '500px',
+      height: '500px',
+      data: {markSheet: true, sampleSheet: true, exam: false, onePdf: true}
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       console.log(result);
+      if (result) {
+        this.downloadPdf(undefined, result);
+      }
     });
   }
 
@@ -121,6 +138,7 @@ export interface DownloadDialogData {
 @Component({
   selector: 'document-download-dialog',
   templateUrl: 'document-download-dialog.html',
+  styleUrls: ['./document-download-dialog.scss']
 })
 export class DocumentDownloadDialog {
 

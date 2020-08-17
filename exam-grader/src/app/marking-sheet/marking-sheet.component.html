@@ -31,8 +31,8 @@
           <div class="mark-slices">
             <div *ngFor="let mark of examManager.realMarks(question); index as j" class="mark-slice">
               <label>({{examManager.getChar(j)}})</label>
-              <mat-checkbox disabled [checked]="sampleSolution && mark"></mat-checkbox>
-              <mat-checkbox disabled [checked]="sampleSolution && !mark"></mat-checkbox>
+              <mat-checkbox [disabled]="evaluation === undefined" [color]="getColor(i, j)" [checked]="getChecked(i, j, mark, true)"></mat-checkbox>
+              <mat-checkbox [disabled]="evaluation === undefined" [color]="getColor(i, j)" [checked]="getChecked(i, j, mark, false)"></mat-checkbox>
             </div>
           </div>
         </div>

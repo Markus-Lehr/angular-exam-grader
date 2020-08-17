@@ -1,21 +1,9 @@
 <h1 mat-dialog-title>Export Exam as PDF</h1>
-<div mat-dialog-content>
-  <mat-form-field>
-    <mat-label>Include mark sheet</mat-label>
-    <mat-checkbox [(ngModel)]="data.markSheet"></mat-checkbox>
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Include sample mark sheet</mat-label>
-    <mat-checkbox [(ngModel)]="data.sampleSheet"></mat-checkbox>
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Include exam</mat-label>
-    <mat-checkbox [(ngModel)]="data.exam"></mat-checkbox>
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Merge into one pdf</mat-label>
-    <mat-checkbox [(ngModel)]="data.onePdf"></mat-checkbox>
-  </mat-form-field>
+<div mat-dialog-content class="dialog-content">
+    <mat-checkbox [(ngModel)]="data.markSheet">Include mark sheet</mat-checkbox>
+    <mat-checkbox [(ngModel)]="data.sampleSheet">Include sample mark sheet</mat-checkbox>
+    <mat-checkbox [(ngModel)]="data.exam">Include exam</mat-checkbox>
+    <mat-checkbox [(ngModel)]="data.onePdf">Merge into one pdf</mat-checkbox>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Abort</button>
