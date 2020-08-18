@@ -21,10 +21,17 @@
 
 .canvases {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 
   .mark-analyzer {
-    width: 128px;
-    height: 128px;
+    width: 32px;
+  }
+
+  .height32 {
+    height: 32px;
+  }
+
+  .half-a4-width {
+    width: 465px;
   }
 }

@@ -15,10 +15,14 @@ const leftPadding = 0;
 const rightPadding = 50;
 const topPadding = 0;
 const bottomPadding = 50;
+
 const a4width = 210 * 5 - 2 * 10 /* white padding */;
 const a4height = 297 * 5 - 2 * 10 /* white padding*/;
-const filledColor = "rgba(0, 200, 200, .3)";
-const emptyColor = "rgba(0, 0, 200, .2)";
+
+const filledColor = "rgba(0, 0 ,200, .2)";
+const emptyColor = "rgba(200,0,0, 0)";
+const uncertainColor = "rgb(255,200,0, .5)";
+
 const certaintyThreshold = 0.98; /* the certainty threshold needs to be exceeded in order for the library to be trusted */
 const inverseThreshold = 1 - certaintyThreshold;
 
@@ -183,6 +187,38 @@ export class EvaluatorComponent implements OnInit {
     return corners;
   }
 
+  private async readImmatriculationNumber(img: HTMLImageElement, original: File, perspective: any) {
+    const immatCanvas = this.immatriculationCanvas.nativeElement as HTMLCanvasElement;
+    const immatriculationCx: CanvasRenderingContext2D = immatCanvas.getContext('2d');
+    const nameCanvas = this.nameCanvas.nativeElement as HTMLCanvasElement;
+    const nameCx: CanvasRenderingContext2D = nameCanvas.getContext('2d');
+
+    const halfInnerA4 = (a4width - 2 * 50 /* marker widths either side*/) / 2;
+    nameCanvas.width = halfInnerA4;
+    nameCanvas.height = 32;
+    immatCanvas.width = halfInnerA4;
+    immatCanvas.height = 32;
+
+    const namePoint: Point = {
+      x: 50 /* marker width */,
+      y: 50 /* marker height */ + 30 + 16 /* title height + margin */ + 32 /* table header height + border */
+    }
+    const transformedNamePoint: number[] = perspective.transform(namePoint.x, namePoint.y);
+
+    const immatriculationPoint: Point = {
+      x: namePoint.x + halfInnerA4,
+      y: namePoint.y
+    }
+    const transformedImmatriculationPoint: number[] = perspective.transform(immatriculationPoint.x, immatriculationPoint.y);
+
+    let transformedWidth, transformedHeight;
+    [transformedWidth, transformedHeight] = perspective.transform(namePoint.x + halfInnerA4, namePoint.y + 32 /* table header + border */)
+      .map((e, i) => e - transformedNamePoint[i]);
+
+    immatriculationCx.drawImage(img, transformedImmatriculationPoint[0], transformedImmatriculationPoint[1], transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
+    nameCx.drawImage(img, transformedNamePoint[0], transformedNamePoint[1], transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
+  }
+
   private async processImage(img: HTMLImageElement, cx: CanvasRenderingContext2D, original: File) {
     this.batchResult.sheets[original.name].processingState = ProcessingState.WORKING;
     const sourceCorners: Point[] = [
@@ -202,6 +238,8 @@ export class EvaluatorComponent implements OnInit {
     cx.canvas.height = this.canvHeight;
     cx.clearRect(0, 0, cx.canvas.width, cx.canvas.height);
     cx.drawImage(img, 0, 0);
+
+    await this.readImmatriculationNumber(img, original, perspT);
 
     const transformedWidth = perspT.transform(520, 0)[0] - perspT.transform(500, 0)[0];
     const transformedHeight = perspT.transform(0, 520)[1] - perspT.transform(0, 500)[1];
@@ -253,9 +291,11 @@ export class EvaluatorComponent implements OnInit {
         }
       }
     }
+    /*
     zip.generateAsync({type: "blob"}).then(function (content) {
       FileSaver.saveAs(content, original.name + '.zip');
     });
+    */
     this.batchResult.sheets[original.name].trueCheckedCertainties = trueCertainTies;
     this.batchResult.sheets[original.name].falseCheckedCertainties = falseCertainTies;
     this.batchResult.sheets[original.name].processingState = ProcessingState.DONE;
