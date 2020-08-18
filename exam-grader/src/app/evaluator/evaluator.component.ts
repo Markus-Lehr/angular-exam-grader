@@ -33,9 +33,18 @@ const inverseThreshold = 1 - certaintyThreshold;
 })
 export class EvaluatorComponent implements OnInit {
   @ViewChild('MainAnalysisCanvas') mainCanvas;
-  @ViewChild('NameAnalysisCanvas') nameCanvas;
-  @ViewChild('ImmatriculationNumberAnalysisCanvas') immatriculationCanvas;
+  @ViewChild('FirstNameAnalysisCanvas') firstNameCanvas;
+  @ViewChild('LastNameAnalysisCanvas') lastNameCanvas;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas1') immatriculationCanvas1;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas2') immatriculationCanvas2;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas3') immatriculationCanvas3;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas4') immatriculationCanvas4;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas5') immatriculationCanvas5;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas6') immatriculationCanvas6;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas7') immatriculationCanvas7;
+  @ViewChild('ImmatriculationNumberAnalysisCanvas8') immatriculationCanvas8;
   @ViewChild('SingleMarkAnalysisCanvas') markAnalyzerCanvas;
+
   public batchResult: BatchResult = {sheets: {}};
   public sheetNames: string[] = [];
   private canvWidth = leftPadding + rightPadding;
@@ -69,25 +78,26 @@ export class EvaluatorComponent implements OnInit {
 
   async initOcr(): Promise<void> {
     this.orcDigitWorker = createWorker({
-      logger: m => console.log(m),
+      // logger: m => console.log(m),
     });
     await this.orcDigitWorker.load();
     await this.orcDigitWorker.loadLanguage('deu');
-    await this.orcDigitWorker.initialize('deu', OEM.TESSERACT_LSTM_COMBINED);
+    await this.orcDigitWorker.initialize('deu');
     await this.orcDigitWorker.setParameters({
-      tessedit_pageseg_mode: PSM.SINGLE_LINE,
+      tessedit_ocr_engine_mode: OEM.DEFAULT,
+      tessedit_pageseg_mode: PSM.SINGLE_CHAR,
       tessedit_char_whitelist: '0123456789',
     });
 
     this.orcNameWorker = createWorker({
-      logger: m => console.log(m),
+      // logger: m => console.log(m),
     });
     await this.orcNameWorker.load();
-    await this.orcNameWorker.loadLanguage('eng');
-    await this.orcNameWorker.initialize('eng', OEM.TESSERACT_LSTM_COMBINED);
+    await this.orcNameWorker.loadLanguage('deu');
+    await this.orcNameWorker.initialize('deu', OEM.TESSERACT_LSTM_COMBINED);
     await this.orcNameWorker.setParameters({
       tessedit_pageseg_mode: PSM.SINGLE_LINE,
-      tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ',
+      tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ- \'`´',
     });
   }
 
@@ -217,44 +227,85 @@ export class EvaluatorComponent implements OnInit {
   }
 
   private async readImmatriculationNumber(img: HTMLImageElement, original: File, perspective: any): Promise<void> {
-    const immatCanvas = this.immatriculationCanvas.nativeElement as HTMLCanvasElement;
-    const immatriculationCx: CanvasRenderingContext2D = immatCanvas.getContext('2d');
-    const nameCanvas = this.nameCanvas.nativeElement as HTMLCanvasElement;
-    const nameCx: CanvasRenderingContext2D = nameCanvas.getContext('2d');
+    const digitCanvases: HTMLCanvasElement[] = [
+      this.immatriculationCanvas1.nativeElement as HTMLCanvasElement,
+      this.immatriculationCanvas2.nativeElement as HTMLCanvasElement,
+      this.immatriculationCanvas3.nativeElement as HTMLCanvasElement,
+      this.immatriculationCanvas4.nativeElement as HTMLCanvasElement,
+      this.immatriculationCanvas5.nativeElement as HTMLCanvasElement,
+      this.immatriculationCanvas6.nativeElement as HTMLCanvasElement,
+      this.immatriculationCanvas7.nativeElement as HTMLCanvasElement,
+      this.immatriculationCanvas8.nativeElement as HTMLCanvasElement
+    ];
+    const digitContextes: CanvasRenderingContext2D[] = digitCanvases.map(c => c.getContext('2d'));
+    const firstNameCanvas = this.firstNameCanvas.nativeElement as HTMLCanvasElement;
+    const firstNameCx: CanvasRenderingContext2D = firstNameCanvas.getContext('2d');
+    const lastNameCanvas = this.lastNameCanvas.nativeElement as HTMLCanvasElement;
+    const lastNameCx: CanvasRenderingContext2D = lastNameCanvas.getContext('2d');
 
-    const halfInnerA4 = (a4width - 2 * 50 /* marker widths either side*/) / 2;
-    nameCanvas.width = halfInnerA4;
-    nameCanvas.height = 32;
-    immatCanvas.width = halfInnerA4;
-    immatCanvas.height = 32;
+    const thirdInnerA4 = (a4width - 2 * 50 /* marker widths either side*/) / 3;
+    firstNameCanvas.width = thirdInnerA4;
+    firstNameCanvas.height = 32;
+    lastNameCanvas.width = thirdInnerA4;
+    lastNameCanvas.height = 32;
+    digitCanvases.forEach(c => {
+      c.width = thirdInnerA4 / 8;
+      c.height = 32;
+    });
+    digitContextes.forEach(cx => {
+      cx.globalCompositeOperation = '';
+    });
 
-    const namePoint: Point = {
+    const firstNamePoint: Point = {
       x: 50 /* marker width */,
       y: 50 /* marker height */ + 30 + 16 /* title height + margin */ + 32 /* table header height + border */
     };
-    const transformedNamePoint: number[] = perspective.transform(namePoint.x, namePoint.y);
+    const transformedFirstNamePoint: number[] = perspective.transform(firstNamePoint.x, firstNamePoint.y);
 
-    const immatriculationPoint: Point = {
-      x: namePoint.x + halfInnerA4,
-      y: namePoint.y
+    const lastNamePoint: Point = {
+      x: 50 /* marker width */ + thirdInnerA4,
+      y: 50 /* marker height */ + 30 + 16 /* title height + margin */ + 32 /* table header height + border */
     };
-    const transformedImmatriculationPoint: number[] = perspective.transform(immatriculationPoint.x, immatriculationPoint.y);
+    const transformedLastNamePoint: number[] = perspective.transform(lastNamePoint.x, lastNamePoint.y);
 
-    let transformedWidth;
+    const immatriculationPoints: Point[] = digitCanvases.map((elem, index) => {
+      return {
+        x: lastNamePoint.x + thirdInnerA4 + index * (thirdInnerA4 / 8),
+        y: firstNamePoint.y
+      };
+    });
+    const transformedImmatriculationPoints: number[][] = immatriculationPoints.map(pt => perspective.transform(pt.x, pt.y));
+
+    let transformedNameWidth;
     let transformedHeight;
-    [transformedWidth, transformedHeight] = perspective.transform(namePoint.x + halfInnerA4, namePoint.y + 32 /* table header + border */)
-      .map((e, i) => e - transformedNamePoint[i]);
+    [transformedNameWidth, transformedHeight] = perspective.transform(
+      firstNamePoint.x + thirdInnerA4, firstNamePoint.y + 32 /* table header + border */)
+      .map((e, i) => e - transformedFirstNamePoint[i]);
+    const transformedDigitWidth = perspective.transform(firstNamePoint.x + thirdInnerA4 / 8, firstNamePoint.y + 32)
+      .map((e, i) => e - transformedFirstNamePoint[i])[0];
 
-    immatriculationCx.drawImage(img, transformedImmatriculationPoint[0], transformedImmatriculationPoint[1],
-      transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
-    const immatResult = await this.orcDigitWorker.recognize(immatCanvas);
-    const immatText = immatResult.data.text;
-    console.log('immatriculation number:', immatText);
-    nameCx.drawImage(img, transformedNamePoint[0], transformedNamePoint[1],
-      transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
-    const nameResult = await this.orcNameWorker.recognize(nameCanvas);
-    const nameText = nameResult.data.text;
-    console.log('name:', nameText);
+    digitContextes.forEach((cx, index) => {
+      cx.drawImage(img, transformedImmatriculationPoints[index][0], transformedImmatriculationPoints[index][1],
+        transformedDigitWidth, transformedHeight, 0, 0, thirdInnerA4 / 8, 32);
+    });
+
+    for (let i = 0; i < digitCanvases.length; i++) {
+      const canvas = digitCanvases[i];
+      const immatResult = await this.orcDigitWorker.recognize(canvas);
+      const immatText = immatResult.data.text;
+      console.log('immatriculation digit', (i + 1), ':', immatText);
+    }
+    firstNameCx.drawImage(img, transformedFirstNamePoint[0], transformedFirstNamePoint[1],
+      transformedNameWidth, transformedHeight, 0, 0, thirdInnerA4, 32);
+    const firstNameResult = await this.orcNameWorker.recognize(firstNameCanvas);
+    const firstNameText = firstNameResult.data.text;
+    console.log('first name:', firstNameText);
+
+    lastNameCx.drawImage(img, transformedLastNamePoint[0], transformedLastNamePoint[1],
+      transformedNameWidth, transformedHeight, 0, 0, thirdInnerA4, 32);
+    const lastNameResult = await this.orcNameWorker.recognize(lastNameCanvas);
+    const lastNameText = lastNameResult.data.text;
+    console.log('last name:', lastNameText);
   }
 
   private async processImage(img: HTMLImageElement, cx: CanvasRenderingContext2D, original: File): Promise<void> {

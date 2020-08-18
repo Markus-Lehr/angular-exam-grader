@@ -23,15 +23,21 @@
   display: flex;
   flex-direction: column;
 
-  .mark-analyzer {
-    width: 32px;
-  }
-
   .height32 {
     height: 32px;
   }
 
-  .half-a4-width {
-    width: 465px;
+  .square {
+    width: 32px;
+    height: 32px;
+  }
+
+  .third-a4-width {
+    width: 290px;
+  }
+
+  .digit-canvases {
+    display: flex;
+    flex-direction: row;
   }
 }

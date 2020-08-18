@@ -56,12 +56,15 @@
         width: 100%;
       }
 
+      th {
+        width: 33.33333333333%;
+      }
+
       td, th {
         border: 1px solid #dddddd;
         text-align: left;
         padding: 5px;
         height: 20px;
-        width: 50%;
       }
     }
 

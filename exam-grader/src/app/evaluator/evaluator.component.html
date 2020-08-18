@@ -13,9 +13,19 @@
 <mat-tab-group animationDuration="0ms" class="visual-container">
   <mat-tab label="Canvas">
     <div class="canvases">
-      <canvas #SingleMarkAnalysisCanvas class="mark-analyzer height32" height="32" width="32"></canvas>
-      <canvas #NameAnalysisCanvas class="height32 half-a4-width" height="32" width="435"></canvas>
-      <canvas #ImmatriculationNumberAnalysisCanvas class="height32 half-a4-width" height="32" width="435"></canvas>
+      <canvas #SingleMarkAnalysisCanvas class="square" height="32" width="32"></canvas>
+      <canvas #FirstNameAnalysisCanvas class="height32 third-a4-width" height="32" width="290"></canvas>
+      <canvas #LastNameAnalysisCanvas class="height32 third-a4-width" height="32" width="290"></canvas>
+      <div class="digit-canvases">
+        <canvas #ImmatriculationNumberAnalysisCanvas1 class="square" height="32" width="32"></canvas>
+        <canvas #ImmatriculationNumberAnalysisCanvas2 class="square" height="32" width="32"></canvas>
+        <canvas #ImmatriculationNumberAnalysisCanvas3 class="square" height="32" width="32"></canvas>
+        <canvas #ImmatriculationNumberAnalysisCanvas4 class="square" height="32" width="32"></canvas>
+        <canvas #ImmatriculationNumberAnalysisCanvas5 class="square" height="32" width="32"></canvas>
+        <canvas #ImmatriculationNumberAnalysisCanvas6 class="square" height="32" width="32"></canvas>
+        <canvas #ImmatriculationNumberAnalysisCanvas7 class="square" height="32" width="32"></canvas>
+        <canvas #ImmatriculationNumberAnalysisCanvas8 class="square" height="32" width="32"></canvas>
+      </div>
       <canvas #MainAnalysisCanvas></canvas>
     </div>
   </mat-tab>

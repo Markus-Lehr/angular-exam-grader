@@ -62,7 +62,7 @@ export class DocumentPreviewComponent implements OnInit {
     });
     console.log(this.markingSheet);
     if (result.onePdf === false) {
-      console.warn('We cannot produce different pdfs yet. Don\'t choose merge pdf.');
+      console.warn('We cannot produce different pdfs yet. Choose merge pdf.');
       return;
     }
     const pageRefs: HTMLElement[] = [];
