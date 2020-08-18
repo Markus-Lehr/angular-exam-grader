@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { TensorflowCheckboxEvaluatorService } from './tensorflow-checkbox-evaluator.service';
+import {TensorflowCheckboxEvaluatorService} from './tensorflow-checkbox-evaluator.service';
 
 describe('TensorflowCheckboxEvaluatorService', () => {
   let service: TensorflowCheckboxEvaluatorService;

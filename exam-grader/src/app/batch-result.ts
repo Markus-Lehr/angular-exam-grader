@@ -19,5 +19,5 @@ export interface AnswerSheetEvaluation {
 }
 
 export interface BatchResult {
-  sheets: {[key: string]: AnswerSheetEvaluation};
+  sheets: { [key: string]: AnswerSheetEvaluation };
 }

@@ -1,19 +1,19 @@
-<button mat-button (click)="createNew()">Create New Exam</button>
+<button (click)="createNew()" mat-button>Create New Exam</button>
 
-<table mat-table [dataSource]="exams">
+<table [dataSource]="exams" mat-table>
   <ng-container matColumnDef="examName">
-    <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let exam"> {{exam.examName}} </td>
+    <th *matHeaderCellDef mat-header-cell>Name</th>
+    <td *matCellDef="let exam" mat-cell> {{exam.examName}} </td>
   </ng-container>
   <ng-container matColumnDef="lastModified">
-    <th mat-header-cell *matHeaderCellDef>Last Modified</th>
-    <td mat-cell *matCellDef="let exam"> {{exam.lastModified | date}} </td>
+    <th *matHeaderCellDef mat-header-cell>Last Modified</th>
+    <td *matCellDef="let exam" mat-cell> {{exam.lastModified | date}} </td>
   </ng-container>
   <ng-container matColumnDef="id">
-    <th mat-header-cell *matHeaderCellDef>ID</th>
-    <td mat-cell *matCellDef="let exam"> {{exam.id}} </td>
+    <th *matHeaderCellDef mat-header-cell>ID</th>
+    <td *matCellDef="let exam" mat-cell> {{exam.id}} </td>
   </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-  <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay" [routerLink]="['/exam/' + myRowData.id]"></tr>
+  <tr *matHeaderRowDef="columnsToDisplay" mat-header-row></tr>
+  <tr *matRowDef="let myRowData; columns: columnsToDisplay" [routerLink]="['/exam/' + myRowData.id]" mat-row></tr>
 </table>

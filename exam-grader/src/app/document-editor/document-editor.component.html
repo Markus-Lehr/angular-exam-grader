@@ -1,6 +1,7 @@
-<input #uploadJsonInput hidden (change)="examManager.import($event.target.files)" type="file">
+<input #uploadJsonInput (change)="examManager.import($event.target.files)" hidden type="file">
 <div class="buttons">
-  <button (click)="examManager.save()" [disabled]="!examManager.modified" color="primary" mat-raised-button>Save</button>
+  <button (click)="examManager.save()" [disabled]="!examManager.modified" color="primary" mat-raised-button>Save
+  </button>
   <button (click)="examManager.export($event)" mat-raised-button>Export .json</button>
   <button (click)="uploadJsonInput.click()" mat-raised-button>Import .json</button>
 </div>

@@ -1,4 +1,4 @@
-import { BatchResult } from './batch-result';
+import {BatchResult} from './batch-result';
 
 describe('BatchResult', () => {
   it('should create an instance', () => {

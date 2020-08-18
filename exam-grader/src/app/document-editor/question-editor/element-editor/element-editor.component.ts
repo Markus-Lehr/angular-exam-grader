@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Question, QuestionBlockTypes} from "../../../exam";
-import {ExamManagerService} from "../../../exam-manager.service";
+import {Question, QuestionBlockTypes} from '../../../exam';
+import {ExamManagerService} from '../../../exam-manager.service';
 
 
 @Component({
@@ -13,7 +13,7 @@ export class ElementEditorComponent implements OnInit {
   @Input()
   question: Question = {elements: [], points: 0};
   @Input()
-  elementIndex: number = 0;
+  elementIndex = 0;
 
   constructor(public examManager: ExamManagerService) {
   }
@@ -39,7 +39,7 @@ export class ElementEditorComponent implements OnInit {
     }
   }
 
-  move(direction: number) {
+  move(direction: number): void {
     if (this.elementIndex === 0 && direction === -1) {
       return;
     }
@@ -47,16 +47,16 @@ export class ElementEditorComponent implements OnInit {
       return;
     }
     [this.question.elements[this.elementIndex], this.question.elements[this.elementIndex + direction]] =
-    [this.question.elements[this.elementIndex + direction], this.question.elements[this.elementIndex]];
+      [this.question.elements[this.elementIndex + direction], this.question.elements[this.elementIndex]];
     this.examManager.modified = true;
   }
 
-  remove() {
+  remove(): void {
     this.examManager.modified = true;
     this.question.elements.splice(this.elementIndex, 1);
   }
 
-  changeType(value: any) {
+  changeType(value: any): void {
     const enumValue = Number(value);
     const current = this.getCurrentType();
     console.log('selecting type:', enumValue, 'current:', current);

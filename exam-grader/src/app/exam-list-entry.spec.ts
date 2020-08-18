@@ -1,4 +1,4 @@
-import { ExamListEntry } from './exam-list-entry';
+import {ExamListEntry} from './exam-list-entry';
 
 describe('ExamListEntry', () => {
   it('should create an instance', () => {

@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ExamManagerService } from './exam-manager.service';
+import {ExamManagerService} from './exam-manager.service';
 
 describe('ExamManagerService', () => {
   let service: ExamManagerService;

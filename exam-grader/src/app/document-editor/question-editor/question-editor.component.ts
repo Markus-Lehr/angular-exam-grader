@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Question, QuestionBlock} from "../../exam";
+import {Question, QuestionBlock} from '../../exam';
 
 @Component({
   selector: 'app-question-editor',
@@ -10,11 +10,11 @@ export class QuestionEditorComponent implements OnInit {
   @Input()
   question: Question = {
     elements: [], points: 0
-  }
+  };
   @Input()
-  index: number = -1;
+  index = -1;
 
-  visible: boolean = true;
+  visible = true;
 
   constructor() {
   }
@@ -26,15 +26,15 @@ export class QuestionEditorComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  changeElementType(event: QuestionBlock, i: number) {
+  changeElementType(event: QuestionBlock, i: number): void {
     this.question.elements[i] = event;
   }
 
-  addElement() {
+  addElement(): void {
     this.question.elements.push({question: undefined, answer: false});
   }
 
-  collapse() {
+  collapse(): void {
     this.visible = !this.visible;
   }
 }

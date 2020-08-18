@@ -1,6 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Exam} from "../exam";
-import {ExamManagerService} from "../exam-manager.service";
+import {Component, OnInit} from '@angular/core';
+import {ExamManagerService} from '../exam-manager.service';
 
 @Component({
   selector: 'app-document-editor',
@@ -8,19 +7,21 @@ import {ExamManagerService} from "../exam-manager.service";
   styleUrls: ['./document-editor.component.scss']
 })
 export class DocumentEditorComponent implements OnInit {
-  constructor(public examManager: ExamManagerService) { }
+  constructor(public examManager: ExamManagerService) {
+  }
 
   ngOnInit(): void {
   }
 
-  createQuestion() {
+  createQuestion(): void {
     this.examManager.exam.questions.push({
       elements: ['Your question body goes here'],
-      points: 5});
+      points: 5
+    });
     this.examManager.modified = true;
   }
 
-  trackByFn(index:number, el:any): number {
+  trackByFn(index: number, el: any): number {
     return index;
   }
 }

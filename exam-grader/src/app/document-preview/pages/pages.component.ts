@@ -6,11 +6,10 @@ import {
   EventEmitter,
   Input,
   OnInit,
-  Output,
-  ViewChild
+  Output
 } from '@angular/core';
-import {ExamManagerService} from "../../exam-manager.service";
-import {Question, QuestionBlock} from "../../exam";
+import {ExamManagerService} from '../../exam-manager.service';
+import {Question, QuestionBlock} from '../../exam';
 
 @Component({
   selector: 'app-pages',
@@ -19,7 +18,7 @@ import {Question, QuestionBlock} from "../../exam";
 })
 export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @Input()
-  autoCompact: boolean = false;
+  autoCompact = false;
   @Output()
   questionSizes = new EventEmitter<DOMRect[]>();
   private lastSizes: DOMRect[] = [];
@@ -34,7 +33,7 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
   }
 
   ngAfterViewChecked(): void {
-    let sizes: DOMRect[] = [];
+    const sizes: DOMRect[] = [];
     const native = this.elem.nativeElement;
     const children: HTMLCollection = native.querySelectorAll('.question-body-wrapper-selector');
     for (let i = 0; i < children.length; i++) {
@@ -46,29 +45,29 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
   }
 
   isText = (elem: QuestionBlock) => {
-    return typeof elem === "string";
+    return typeof elem === 'string';
   }
 
   isImage = (elem: QuestionBlock) => {
-    return typeof elem === "object" && 'base64string' in elem;
+    return typeof elem === 'object' && 'base64string' in elem;
   }
 
   isQuestion = (elem: QuestionBlock) => {
-    return typeof elem === "object" && 'question' in elem;
+    return typeof elem === 'object' && 'question' in elem;
   }
 
-  trackByFn(index, item) {
+  trackByFn(index, item): any {
     return index;
   }
 
   pages(): Question[][] {
     if (this.autoCompact) {
-      let pages = [];
+      const pages = [];
       let currentPage: Question[] = [];
-      let currentPageSize: number = 0;
-      const maxPageHeight: number = 1400;
-      for (let i = 0; i < this.lastSizes.length; i++){
-        let questionSize = this.lastSizes[i];
+      let currentPageSize = 0;
+      const maxPageHeight = 1400;
+      for (let i = 0; i < this.lastSizes.length; i++) {
+        const questionSize = this.lastSizes[i];
         if (currentPageSize + questionSize.height > maxPageHeight) {
           currentPageSize = 0;
           pages.push(currentPage);
@@ -85,11 +84,11 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
     }
   }
 
-  compactPages(sizes: DOMRect[]) {
+  compactPages(sizes: DOMRect[]): void {
     this.lastSizes = sizes;
   }
 
-  getQuestionNumber(pageIndex: number, questionIndex: number) {
+  getQuestionNumber(pageIndex: number, questionIndex: number): number {
     const pages = this.pages();
     let questionNumber = 1 + questionIndex;
     for (let i = 0; i < pageIndex; i++) {

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {ExamManagerService} from "../../exam-manager.service";
+import {Component, OnInit} from '@angular/core';
+import {ExamManagerService} from '../../exam-manager.service';
 
 @Component({
   selector: 'app-page-header',
@@ -8,7 +8,8 @@ import {ExamManagerService} from "../../exam-manager.service";
 })
 export class PageHeaderComponent implements OnInit {
 
-  constructor(public examManager: ExamManagerService) { }
+  constructor(public examManager: ExamManagerService) {
+  }
 
   ngOnInit(): void {
   }

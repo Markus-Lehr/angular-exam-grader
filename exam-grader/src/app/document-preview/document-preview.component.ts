@@ -1,15 +1,11 @@
 import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
-import html2canvas from "html2canvas";
+import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import {ExamManagerService} from "../exam-manager.service";
-import {Point} from "@angular/cdk/drag-drop";
-import {AR} from "js-aruco";
-import PerspT from "perspective-transform";
-import {AnswerSheetEvaluation, AnswerState, BatchResult} from "../batch-result";
-import * as JSZip from 'jszip';
-import * as FileSaver from 'file-saver';
-import {TensorflowCheckboxEvaluatorService} from "../tensorflow-checkbox-evaluator.service";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {ExamManagerService} from '../exam-manager.service';
+import {Point} from '@angular/cdk/drag-drop';
+import {BatchResult} from '../batch-result';
+import {TensorflowCheckboxEvaluatorService} from '../tensorflow-checkbox-evaluator.service';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -17,8 +13,8 @@ const topPadding = 0;
 const bottomPadding = 50;
 const a4width = 210 * 5 - 2 * 10 /* white padding */;
 const a4height = 297 * 5 - 2 * 10 /* white padding*/;
-const filledColor = "rgba(0, 200, 200, .3)";
-const emptyColor = "rgba(0, 0, 200, .2)";
+const filledColor = 'rgba(0, 200, 200, .3)';
+const emptyColor = 'rgba(0, 0, 200, .2)';
 
 @Component({
   selector: 'app-document-preview',
@@ -27,14 +23,17 @@ const emptyColor = "rgba(0, 0, 200, .2)";
 })
 export class DocumentPreviewComponent implements OnInit {
   @ViewChild('pages') pages;
-  @ViewChild('markingSheet', { read: ElementRef }) markingSheet: ElementRef;
-  @ViewChild('sampleSheet', { read: ElementRef }) sampleSheet: ElementRef;
+  @ViewChild('markingSheet', {read: ElementRef}) markingSheet: ElementRef;
+  @ViewChild('sampleSheet', {read: ElementRef}) sampleSheet: ElementRef;
 
   public canvWidth = leftPadding + rightPadding;
   public canvHeight = topPadding + bottomPadding;
-  private batchResult: BatchResult = {sheets: {}}
+  private batchResult: BatchResult = {sheets: {}};
 
-  constructor(private elRef: ElementRef, public examManager: ExamManagerService, private tfEval: TensorflowCheckboxEvaluatorService, public dialog: MatDialog) {
+  constructor(private elRef: ElementRef,
+              public examManager: ExamManagerService,
+              private tfEval: TensorflowCheckboxEvaluatorService,
+              public dialog: MatDialog) {
   }
 
   private static flattenPoints(pts: Point[]): number[] {
@@ -48,17 +47,17 @@ export class DocumentPreviewComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async sleep(s: number = 1) {
+  async sleep(s: number = 1): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 1000 * s));
   }
 
-  async downloadPdf(event: MouseEvent, result: DownloadDialogData) {
+  async downloadPdf(event: MouseEvent, result: DownloadDialogData): Promise<void> {
     console.log('downloading pdf');
-    let pdf = new jsPDF();
+    const pdf = new jsPDF();
     // preprocess svg elements for fixing problems between katex and html2canvas
     const svgElements = document.body.querySelectorAll('svg');
-    svgElements.forEach(function (item) {
-      item.setAttribute("width", String(item.getBoundingClientRect().width));
+    svgElements.forEach(item => {
+      item.setAttribute('width', String(item.getBoundingClientRect().width));
       item.style.width = null;
     });
     console.log(this.markingSheet);
@@ -66,7 +65,7 @@ export class DocumentPreviewComponent implements OnInit {
       console.warn('We cannot produce different pdfs yet. Don\'t choose merge pdf.');
       return;
     }
-    let pageRefs: HTMLElement[] = [];
+    const pageRefs: HTMLElement[] = [];
     if (result.markSheet) {
       pageRefs.push(this.markingSheet.nativeElement);
     }
@@ -78,8 +77,8 @@ export class DocumentPreviewComponent implements OnInit {
     }
     console.log(pageRefs);
 
-    for (let i = 0; i < pageRefs.length; i++){
-      let pageRef = pageRefs[i];
+    for (let i = 0; i < pageRefs.length; i++) {
+      const pageRef = pageRefs[i];
       if (pageRef.nodeName === 'APP-PAGES') {
         continue;
       }
@@ -95,7 +94,7 @@ export class DocumentPreviewComponent implements OnInit {
   }
 
   openDialog(): void {
-    const dialogRef = this.dialog.open(DocumentDownloadDialog, {
+    const dialogRef = this.dialog.open(DocumentDownloadDialogComponent, {
       width: '500px',
       height: '500px',
       data: {markSheet: true, sampleSheet: true, exam: false, onePdf: true}
@@ -124,7 +123,7 @@ export class DocumentPreviewComponent implements OnInit {
     return {
       x: xOffset + markIndex * 30 /* checkbox width (20) + margin (10) */,
       y: yOffset + (truthValue ? 0 : 20) /* checkbox height (20) */
-    }
+    };
   }
 }
 
@@ -136,15 +135,16 @@ export interface DownloadDialogData {
 }
 
 @Component({
-  selector: 'document-download-dialog',
+  selector: 'app-document-download-dialog',
   templateUrl: 'document-download-dialog.html',
   styleUrls: ['./document-download-dialog.scss']
 })
-export class DocumentDownloadDialog {
+export class DocumentDownloadDialogComponent {
 
   constructor(
-    public dialogRef: MatDialogRef<DocumentDownloadDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: DownloadDialogData) {}
+    public dialogRef: MatDialogRef<DocumentDownloadDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: DownloadDialogData) {
+  }
 
   onNoClick(): void {
     this.dialogRef.close();

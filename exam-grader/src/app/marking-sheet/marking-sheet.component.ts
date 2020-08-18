@@ -1,8 +1,8 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
-import {ExamManagerService} from "../exam-manager.service";
-import ArucoMarker from "aruco-marker";
-import {AnswerSheetEvaluation, AnswerState} from "../batch-result";
-import {ThemePalette} from "@angular/material/core";
+import {ExamManagerService} from '../exam-manager.service';
+import ArucoMarker from 'aruco-marker';
+import {AnswerSheetEvaluation, AnswerState} from '../batch-result';
+import {ThemePalette} from '@angular/material/core';
 
 @Component({
   selector: 'app-marking-sheet',
@@ -16,7 +16,7 @@ export class MarkingSheetComponent implements OnInit, AfterViewInit {
   @ViewChild('bottomRightArucoMarker') bottomRightArucoMarker;
 
   @Input()
-  sampleSolution: boolean = false;
+  sampleSolution = false;
   @Input()
   evaluation: AnswerSheetEvaluation = undefined;
 

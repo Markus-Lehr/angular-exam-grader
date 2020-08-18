@@ -1,4 +1,5 @@
-<app-pages class="inner-pages" (questionSizes)="compactPages($event)" *ngIf="autoCompact" [autoCompact]="false"></app-pages>
+<app-pages (questionSizes)="compactPages($event)" *ngIf="autoCompact" [autoCompact]="false"
+           class="inner-pages"></app-pages>
 
 <ng-container *ngFor="let page of pages(); index as i; trackBy: trackByFn" class="page">
   <div class="content-wrapper">

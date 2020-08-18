@@ -1,4 +1,4 @@
-import {Exam} from "./exam";
+import {Exam} from './exam';
 
 const DEMO_EXAM: Exam = {
   id: 'demoexam',

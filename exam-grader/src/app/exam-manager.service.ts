@@ -1,16 +1,16 @@
 import {Injectable} from '@angular/core';
-import {Exam, Question} from "./exam";
-import {Point} from "@angular/cdk/drag-drop";
-import {FULL_EXAM} from "./test-exams";
+import {Exam, Question} from './exam';
+import {Point} from '@angular/cdk/drag-drop';
+import {FULL_EXAM} from './test-exams';
 import * as FileSaver from 'file-saver';
 
-const demoExam: Exam = FULL_EXAM
+const demoExam: Exam = FULL_EXAM;
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExamManagerService {
-  public modified: boolean = false;
+  public modified = false;
   public exam: Exam = demoExam;
 
   public verticalFactor = 40;
@@ -26,15 +26,15 @@ export class ExamManagerService {
   }
 
 
-  private static styleForCoordWithOffset(coord: Point, offset: Point) {
+  private static styleForCoordWithOffset(coord: Point, offset: Point): any {
     return {
-      'position': 'absolute',
-      'left': (coord.x + offset.x) + 'px',
-      'top': (coord.y + offset.y) + 'px',
-    }
+      position: 'absolute',
+      left: (coord.x + offset.x) + 'px',
+      top: (coord.y + offset.y) + 'px',
+    };
   }
 
-  public styleForCoord(coord: Point, truthValue: boolean = true) {
+  public styleForCoord(coord: Point, truthValue: boolean = true): any {
     return ExamManagerService.styleForCoordWithOffset(coord, {x: 0, y: truthValue ? 0 : this.verticalFactor});
   }
 
@@ -62,12 +62,12 @@ export class ExamManagerService {
   }
 
   public getCharOfElem(question: Question, elemNr: number): string {
-    let index: number = 0;
+    let index = 0;
     for (let i = 0; i < question.elements.length; i++) {
       if (i === elemNr) {
         return this.getChar(index);
       }
-      let element = question.elements[i];
+      const element = question.elements[i];
       if (typeof element === 'object' && 'question' in element) {
         index++;
       }
@@ -80,7 +80,7 @@ export class ExamManagerService {
   }
 
   public realMarks(question: Question): boolean[] {
-    let markResults: boolean[] = [];
+    const markResults: boolean[] = [];
     for (const element of question.elements) {
       if (typeof element === 'object' && 'question' in element) {
         markResults.push(element.answer);
@@ -90,12 +90,12 @@ export class ExamManagerService {
   }
 
   public calculateMarkPositions(): Point[][] {
-    let pts: Point[][] = [];
+    const pts: Point[][] = [];
     for (let i = 0; i < this.exam.questions.length; i++) {
       const question = this.exam.questions[i];
       const index = i * 3;
       const yCoord: number = index * this.verticalFactor + this.verticalOffset;
-      let questionPoints: Point[] = [];
+      const questionPoints: Point[] = [];
       let questionCounter = 0;
       for (const element of question.elements) {
         if (typeof element === 'object' && 'question' in element) {
@@ -108,19 +108,19 @@ export class ExamManagerService {
     return pts;
   }
 
-  loadExam(examId: string) {
+  loadExam(examId: string): void {
     this.exam = JSON.parse(localStorage.getItem(examId));
     if (!this.exam) {
       this.generateNewExam(examId);
     }
   }
 
-  public save() {
+  public save(): void {
     localStorage.setItem(this.exam.id, JSON.stringify(this.exam));
     this.modified = false;
   }
 
-  export(event: MouseEvent) {
+  export(event: MouseEvent): void {
     const examBytes: Uint8Array = new TextEncoder().encode(JSON.stringify(this.exam));
     const blob = new Blob([examBytes], {
       type: 'application/json;charset=utf-8'
@@ -128,7 +128,7 @@ export class ExamManagerService {
     FileSaver.saveAs(blob, this.exam.title + '.json');
   }
 
-  import(files: FileList) {
+  import(files: FileList): void {
     if (files.length !== 1) {
       return;
     }
@@ -136,7 +136,7 @@ export class ExamManagerService {
     console.log(file);
     this.fileReader.onload = (contentWrapper => {
       const result = contentWrapper.target.result;
-      if (result && typeof result === "string") {
+      if (result && typeof result === 'string') {
         this.exam = JSON.parse(result);
         this.modified = true;
       }
@@ -144,7 +144,7 @@ export class ExamManagerService {
     this.fileReader.readAsText(file);
   }
 
-  private generateNewExam(examId: string) {
+  private generateNewExam(examId: string): void {
     console.log('generating new exam');
     this.exam = {
       id: examId,

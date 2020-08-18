@@ -1,18 +1,15 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
-import {ExamManagerService} from "../exam-manager.service";
-import {TensorflowCheckboxEvaluatorService} from "../tensorflow-checkbox-evaluator.service";
-import {AnswerSheetEvaluation, AnswerState, BatchResult, ProcessingState} from "../batch-result";
-import {Point} from "@angular/cdk/drag-drop";
-import * as JSZip from "jszip";
-import {AR} from "js-aruco";
+import {ActivatedRoute} from '@angular/router';
+import {ExamManagerService} from '../exam-manager.service';
+import {TensorflowCheckboxEvaluatorService} from '../tensorflow-checkbox-evaluator.service';
+import {AnswerSheetEvaluation, AnswerState, BatchResult, ProcessingState} from '../batch-result';
+import {Point} from '@angular/cdk/drag-drop';
+import * as JSZip from 'jszip';
+import {AR} from 'js-aruco';
 import {createWorker, OEM, PSM, Worker} from 'tesseract.js';
-import * as FileSaver from 'file-saver';
-import PerspT from "perspective-transform";
-import {PointCalculatorService} from "../point-calculator.service";
-import {LoadingService} from "../loading-screen/loading.service";
-import {create} from "domain";
-import {worker} from "cluster";
+import PerspT from 'perspective-transform';
+import {PointCalculatorService} from '../point-calculator.service';
+import {LoadingService} from '../loading-screen/loading.service';
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -22,9 +19,9 @@ const bottomPadding = 50;
 const a4width = 210 * 5 - 2 * 10 /* white padding */;
 const a4height = 297 * 5 - 2 * 10 /* white padding*/;
 
-const filledColor = "rgba(0, 0 ,200, .2)";
-const emptyColor = "rgba(200,0,0, 0)";
-const uncertainColor = "rgb(255,200,0, .5)";
+const filledColor = 'rgba(0, 0 ,200, .2)';
+const emptyColor = 'rgba(200,0,0, 0)';
+const uncertainColor = 'rgb(255,200,0, .5)';
 
 const certaintyThreshold = 0.98; /* the certainty threshold needs to be exceeded in order for the library to be trusted */
 const inverseThreshold = 1 - certaintyThreshold;
@@ -63,14 +60,14 @@ export class EvaluatorComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      this.examManager.loadExam(params['id']);
+      this.examManager.loadExam(params.id);
     });
     this.initOcr().then(() => {
       console.log('OCR initialized');
     });
   }
 
-  async initOcr() {
+  async initOcr(): Promise<void> {
     this.orcDigitWorker = createWorker({
       logger: m => console.log(m),
     });
@@ -79,7 +76,7 @@ export class EvaluatorComponent implements OnInit {
     await this.orcDigitWorker.initialize('deu', OEM.TESSERACT_LSTM_COMBINED);
     await this.orcDigitWorker.setParameters({
       tessedit_pageseg_mode: PSM.SINGLE_LINE,
-      tessedit_char_whitelist: "0123456789",
+      tessedit_char_whitelist: '0123456789',
     });
 
     this.orcNameWorker = createWorker({
@@ -90,18 +87,18 @@ export class EvaluatorComponent implements OnInit {
     await this.orcNameWorker.initialize('eng', OEM.TESSERACT_LSTM_COMBINED);
     await this.orcNameWorker.setParameters({
       tessedit_pageseg_mode: PSM.SINGLE_LINE,
-      tessedit_char_whitelist: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ",
+      tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ',
     });
   }
 
-  async importFiles(files: FileList) {
+  async importFiles(files: FileList): Promise<void> {
     this.loading.show = true;
     console.log(files);
     await this.tfEval.initialize();
     this.batchResult = {sheets: {}};
     this.sheetNames = [];
     const img: HTMLImageElement = new Image(1240, 1745);
-    const canvas: HTMLCanvasElement = this.mainCanvas.nativeElement as HTMLCanvasElement
+    const canvas: HTMLCanvasElement = this.mainCanvas.nativeElement as HTMLCanvasElement;
     const cx: CanvasRenderingContext2D = canvas.getContext('2d');
 
     canvas.width = leftPadding + rightPadding;
@@ -126,7 +123,7 @@ export class EvaluatorComponent implements OnInit {
   }
 
   markToPx(questionIndex: number, markIndex: number, truthValue: boolean): Point {
-    let nextCol: boolean = false;
+    let nextCol = false;
     if (questionIndex > 8) {
       nextCol = true;
       questionIndex -= 9;
@@ -147,7 +144,7 @@ export class EvaluatorComponent implements OnInit {
     return {
       x: xOffset + (nextCol ? halfWidth : 0) + markIndex * 30 /* checkbox width (20) + margin (10) */,
       y: yOffset + (truthValue ? 0 : 20) /* checkbox height (20) */
-    }
+    };
   }
 
   iconForFile(file: string): string {
@@ -167,16 +164,16 @@ export class EvaluatorComponent implements OnInit {
     }
   }
 
-  private async addImageSrc(img: HTMLImageElement, src: string) {
+  private async addImageSrc(img: HTMLImageElement, src: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      img.onload = () => resolve(img.height);
+      img.onload = () => resolve();
       img.onerror = reject;
       img.src = src;
     });
   }
 
   private async getImgCorners(img: HTMLImageElement, cx: CanvasRenderingContext2D): Promise<Point[]> {
-    let detector = new AR.Detector();
+    const detector = new AR.Detector();
     const corners: Point[] = [];
     const markers: Point[][] = [];
     const quarterWidth = img.width / 4;
@@ -219,7 +216,7 @@ export class EvaluatorComponent implements OnInit {
     return corners;
   }
 
-  private async readImmatriculationNumber(img: HTMLImageElement, original: File, perspective: any) {
+  private async readImmatriculationNumber(img: HTMLImageElement, original: File, perspective: any): Promise<void> {
     const immatCanvas = this.immatriculationCanvas.nativeElement as HTMLCanvasElement;
     const immatriculationCx: CanvasRenderingContext2D = immatCanvas.getContext('2d');
     const nameCanvas = this.nameCanvas.nativeElement as HTMLCanvasElement;
@@ -234,37 +231,40 @@ export class EvaluatorComponent implements OnInit {
     const namePoint: Point = {
       x: 50 /* marker width */,
       y: 50 /* marker height */ + 30 + 16 /* title height + margin */ + 32 /* table header height + border */
-    }
+    };
     const transformedNamePoint: number[] = perspective.transform(namePoint.x, namePoint.y);
 
     const immatriculationPoint: Point = {
       x: namePoint.x + halfInnerA4,
       y: namePoint.y
-    }
+    };
     const transformedImmatriculationPoint: number[] = perspective.transform(immatriculationPoint.x, immatriculationPoint.y);
 
-    let transformedWidth, transformedHeight;
+    let transformedWidth;
+    let transformedHeight;
     [transformedWidth, transformedHeight] = perspective.transform(namePoint.x + halfInnerA4, namePoint.y + 32 /* table header + border */)
       .map((e, i) => e - transformedNamePoint[i]);
 
-    immatriculationCx.drawImage(img, transformedImmatriculationPoint[0], transformedImmatriculationPoint[1], transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
+    immatriculationCx.drawImage(img, transformedImmatriculationPoint[0], transformedImmatriculationPoint[1],
+      transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
     const immatResult = await this.orcDigitWorker.recognize(immatCanvas);
     const immatText = immatResult.data.text;
     console.log('immatriculation number:', immatText);
-    nameCx.drawImage(img, transformedNamePoint[0], transformedNamePoint[1], transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
+    nameCx.drawImage(img, transformedNamePoint[0], transformedNamePoint[1],
+      transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
     const nameResult = await this.orcNameWorker.recognize(nameCanvas);
     const nameText = nameResult.data.text;
     console.log('name:', nameText);
   }
 
-  private async processImage(img: HTMLImageElement, cx: CanvasRenderingContext2D, original: File) {
+  private async processImage(img: HTMLImageElement, cx: CanvasRenderingContext2D, original: File): Promise<void> {
     this.batchResult.sheets[original.name].processingState = ProcessingState.WORKING;
     const sourceCorners: Point[] = [
       {x: 0, y: 0},
       {x: a4width, y: 0},
       {x: 0, y: a4height},
       {x: a4width, y: a4height}
-    ]
+    ];
     const flatSourceCorners: number[] = EvaluatorComponent.flattenPoints(sourceCorners);
     const targetCorners: Point[] = await this.getImgCorners(img, cx);
     const flatTargetCorners: number[] = EvaluatorComponent.flattenPoints(targetCorners);
@@ -284,7 +284,7 @@ export class EvaluatorComponent implements OnInit {
     const markCx: CanvasRenderingContext2D = this.markAnalyzerCanvas.nativeElement.getContext('2d');
     const trueCertainTies: number[][] = [];
     const falseCertainTies: number[][] = [];
-    let zip = new JSZip();
+    const zip = new JSZip();
 
     for (let i = 0; i < this.examManager.exam.questions.length; i++) {
       trueCertainTies.push([]);
@@ -303,11 +303,15 @@ export class EvaluatorComponent implements OnInit {
 
           markCx.drawImage(img, trueMarkPt.x, trueMarkPt.y, transformedWidth, transformedHeight, 0, 0, 32, 32);
           const truePrediction = await this.tfEval.predict(markCx.canvas);
-          zip.file('mark' + i + '_' + markIndex + '_true.png', markCx.canvas.toDataURL().replace('data:image/png;base64,', ''), {base64: true})
+          zip.file('mark' + i + '_' + markIndex + '_true.png',
+            markCx.canvas.toDataURL().replace('data:image/png;base64,', ''),
+            {base64: true});
 
           markCx.drawImage(img, falseMarkPt.x, falseMarkPt.y, transformedWidth, transformedHeight, 0, 0, 32, 32);
           const falsePrediction = await this.tfEval.predict(markCx.canvas);
-          zip.file('mark' + i + '_' + markIndex + '_false.png', markCx.canvas.toDataURL().replace('data:image/png;base64,', ''), {base64: true})
+          zip.file('mark' + i + '_' + markIndex + '_false.png',
+            markCx.canvas.toDataURL().replace('data:image/png;base64,', ''),
+            {base64: true});
 
           trueCertainTies[i].push(truePrediction);
           falseCertainTies[i].push(falsePrediction);
@@ -339,20 +343,22 @@ export class EvaluatorComponent implements OnInit {
     this.batchResult.sheets[original.name].processingState = ProcessingState.DONE;
   }
 
-  private evaluateSheet(sheet: AnswerSheetEvaluation) {
-    sheet.answerStates = []
+  private evaluateSheet(sheet: AnswerSheetEvaluation): void {
+    sheet.answerStates = [];
     for (let i = 0; i < this.examManager.exam.questions.length; i++) {
-      sheet.answerStates.push([])
-      let question = this.examManager.exam.questions[i];
+      sheet.answerStates.push([]);
+      const question = this.examManager.exam.questions[i];
       let markIndex = 0;
       for (const element of question.elements) {
         if (typeof element === 'object' && 'question' in element) {
-          if (sheet.trueCheckedCertainties[i][markIndex] >= certaintyThreshold && sheet.falseCheckedCertainties[i][markIndex] >= certaintyThreshold) {
+          if (sheet.trueCheckedCertainties[i][markIndex] >= certaintyThreshold &&
+            sheet.falseCheckedCertainties[i][markIndex] >= certaintyThreshold) {
             sheet.answerStates[i].push(AnswerState.WRONG);
-          } else if (sheet.trueCheckedCertainties[i][markIndex] <= inverseThreshold && sheet.falseCheckedCertainties[i][markIndex] <= inverseThreshold) {
+          } else if (sheet.trueCheckedCertainties[i][markIndex] <= inverseThreshold &&
+            sheet.falseCheckedCertainties[i][markIndex] <= inverseThreshold) {
             sheet.answerStates[i].push(AnswerState.EMPTY);
           } else {
-            let answer: boolean = undefined;
+            let answer: boolean;
             if (sheet.trueCheckedCertainties[i][markIndex] >= certaintyThreshold) {
               answer = true;
             } else if (sheet.falseCheckedCertainties[i][markIndex] >= certaintyThreshold) {
