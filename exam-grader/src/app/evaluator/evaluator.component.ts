@@ -6,10 +6,13 @@ import {AnswerSheetEvaluation, AnswerState, BatchResult, ProcessingState} from "
 import {Point} from "@angular/cdk/drag-drop";
 import * as JSZip from "jszip";
 import {AR} from "js-aruco";
+import {createWorker, OEM, PSM, Worker} from 'tesseract.js';
 import * as FileSaver from 'file-saver';
 import PerspT from "perspective-transform";
 import {PointCalculatorService} from "../point-calculator.service";
 import {LoadingService} from "../loading-screen/loading.service";
+import {create} from "domain";
+import {worker} from "cluster";
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -40,6 +43,8 @@ export class EvaluatorComponent implements OnInit {
   public sheetNames: string[] = [];
   private canvWidth = leftPadding + rightPadding;
   private canvHeight = topPadding + bottomPadding;
+  private orcDigitWorker: Worker;
+  private orcNameWorker: Worker;
 
   constructor(private route: ActivatedRoute,
               private examManager: ExamManagerService,
@@ -59,6 +64,33 @@ export class EvaluatorComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.examManager.loadExam(params['id']);
+    });
+    this.initOcr().then(() => {
+      console.log('OCR initialized');
+    });
+  }
+
+  async initOcr() {
+    this.orcDigitWorker = createWorker({
+      logger: m => console.log(m),
+    });
+    await this.orcDigitWorker.load();
+    await this.orcDigitWorker.loadLanguage('deu');
+    await this.orcDigitWorker.initialize('deu', OEM.TESSERACT_LSTM_COMBINED);
+    await this.orcDigitWorker.setParameters({
+      tessedit_pageseg_mode: PSM.SINGLE_LINE,
+      tessedit_char_whitelist: "0123456789",
+    });
+
+    this.orcNameWorker = createWorker({
+      logger: m => console.log(m),
+    });
+    await this.orcNameWorker.load();
+    await this.orcNameWorker.loadLanguage('eng');
+    await this.orcNameWorker.initialize('eng', OEM.TESSERACT_LSTM_COMBINED);
+    await this.orcNameWorker.setParameters({
+      tessedit_pageseg_mode: PSM.SINGLE_LINE,
+      tessedit_char_whitelist: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ",
     });
   }
 
@@ -216,7 +248,13 @@ export class EvaluatorComponent implements OnInit {
       .map((e, i) => e - transformedNamePoint[i]);
 
     immatriculationCx.drawImage(img, transformedImmatriculationPoint[0], transformedImmatriculationPoint[1], transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
+    const immatResult = await this.orcDigitWorker.recognize(immatCanvas);
+    const immatText = immatResult.data.text;
+    console.log('immatriculation number:', immatText);
     nameCx.drawImage(img, transformedNamePoint[0], transformedNamePoint[1], transformedWidth, transformedHeight, 0, 0, halfInnerA4, 32);
+    const nameResult = await this.orcNameWorker.recognize(nameCanvas);
+    const nameText = nameResult.data.text;
+    console.log('name:', nameText);
   }
 
   private async processImage(img: HTMLImageElement, cx: CanvasRenderingContext2D, original: File) {
