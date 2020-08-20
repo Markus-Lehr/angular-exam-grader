@@ -14,10 +14,10 @@ export class ExamEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.examId = params.id;
+    this.route.paramMap.subscribe(params => {
+      console.log(params);
+      this.examId = params.get('id');
       this.examManager.loadExam(this.examId);
-
     });
   }
 

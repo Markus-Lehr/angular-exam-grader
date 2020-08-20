@@ -90,7 +90,7 @@ export class DocumentPreviewComponent implements OnInit {
       pdf.setPage(i + 1);
       await pdf.addImage(contentDataURL, 'JPEG', 0, 0, 210, 297);
     }
-    pdf.save('test.pdf');
+    pdf.save(this.examManager.exam.title + '.pdf');
   }
 
   openDialog(): void {

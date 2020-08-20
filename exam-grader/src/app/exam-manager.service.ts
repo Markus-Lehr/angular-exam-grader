@@ -3,6 +3,7 @@ import {Exam, Question} from './exam';
 import {Point} from '@angular/cdk/drag-drop';
 import {FULL_EXAM} from './test-exams';
 import * as FileSaver from 'file-saver';
+import {StorageService} from "./storage.service";
 
 const demoExam: Exam = FULL_EXAM;
 
@@ -12,6 +13,7 @@ const demoExam: Exam = FULL_EXAM;
 export class ExamManagerService {
   public modified = false;
   public exam: Exam = demoExam;
+  public lastExamId: string = undefined;
 
   public verticalFactor = 40;
   public horizontalFactor = 40;
@@ -21,7 +23,7 @@ export class ExamManagerService {
 
   private fileReader: FileReader;
 
-  constructor() {
+  constructor(private store: StorageService) {
     this.fileReader = new FileReader();
   }
 
@@ -68,7 +70,7 @@ export class ExamManagerService {
         return this.getChar(index);
       }
       const element = question.elements[i];
-      if (typeof element === 'object' && 'question' in element) {
+      if (typeof element === 'object' && 'answer' in element) {
         index++;
       }
     }
@@ -82,7 +84,7 @@ export class ExamManagerService {
   public realMarks(question: Question): boolean[] {
     const markResults: boolean[] = [];
     for (const element of question.elements) {
-      if (typeof element === 'object' && 'question' in element) {
+      if (typeof element === 'object' && 'answer' in element) {
         markResults.push(element.answer);
       }
     }
@@ -98,7 +100,7 @@ export class ExamManagerService {
       const questionPoints: Point[] = [];
       let questionCounter = 0;
       for (const element of question.elements) {
-        if (typeof element === 'object' && 'question' in element) {
+        if (typeof element === 'object' && 'answer' in element) {
           questionPoints.push({x: questionCounter * this.horizontalFactor + this.horizontalMarkOffset, y: yCoord});
           questionCounter++;
         }
@@ -109,6 +111,7 @@ export class ExamManagerService {
   }
 
   loadExam(examId: string): void {
+    this.lastExamId = examId;
     this.exam = JSON.parse(localStorage.getItem(examId));
     if (!this.exam) {
       this.generateNewExam(examId);
@@ -116,7 +119,7 @@ export class ExamManagerService {
   }
 
   public save(): void {
-    localStorage.setItem(this.exam.id, JSON.stringify(this.exam));
+    localStorage.setItem(this.exam.id || this.lastExamId, JSON.stringify(this.exam));
     this.modified = false;
   }
 

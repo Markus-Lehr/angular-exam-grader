@@ -5,6 +5,7 @@ import {TensorflowCheckboxEvaluatorService} from '../tensorflow-checkbox-evaluat
 import {AnswerSheetEvaluation, AnswerState, BatchResult, ProcessingState} from '../batch-result';
 import {Point} from '@angular/cdk/drag-drop';
 import * as JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
 import {AR} from 'js-aruco';
 import {createWorker, OEM, PSM, Worker} from 'tesseract.js';
 import PerspT from 'perspective-transform';
@@ -20,7 +21,7 @@ const a4width = 210 * 5 - 2 * 10 /* white padding */;
 const a4height = 297 * 5 - 2 * 10 /* white padding*/;
 
 const filledColor = 'rgba(0, 0 ,200, .2)';
-const emptyColor = 'rgba(200,0,0, 0)';
+const emptyColor = 'rgba(0,255,0, .1)';
 const uncertainColor = 'rgb(255,200,0, .5)';
 
 const certaintyThreshold = 0.98; /* the certainty threshold needs to be exceeded in order for the library to be trusted */
@@ -68,8 +69,10 @@ export class EvaluatorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.examManager.loadExam(params.id);
+
+    this.route.paramMap.subscribe(params => {
+      console.log(params);
+      this.examManager.loadExam(params.get('id'));
     });
     this.initOcr().then(() => {
       console.log('OCR initialized');
@@ -134,10 +137,10 @@ export class EvaluatorComponent implements OnInit {
 
   markToPx(questionIndex: number, markIndex: number, truthValue: boolean): Point {
     let nextCol = false;
-    if (questionIndex > 8) {
+    if (questionIndex > 9) {
       nextCol = true;
-      questionIndex -= 9;
-    } else if (questionIndex > 18) {
+      questionIndex -= 10;
+    } else if (questionIndex > 19) {
       console.warn('probably to many different questions; cant comprehend questionIndex:', questionIndex);
       return undefined;
     }
@@ -343,7 +346,7 @@ export class EvaluatorComponent implements OnInit {
       const question = this.examManager.exam.questions[i];
       let markIndex = 0;
       for (const element of question.elements) {
-        if (typeof element === 'object' && 'question' in element) {
+        if (typeof element === 'object' && 'answer' in element) {
           const truePt = this.markToPx(i, markIndex, true);
           const falsePt = this.markToPx(i, markIndex, false);
 
@@ -384,11 +387,9 @@ export class EvaluatorComponent implements OnInit {
         }
       }
     }
-    /*
-    zip.generateAsync({type: "blob"}).then(function (content) {
+    zip.generateAsync({type: 'blob'}).then(content => {
       FileSaver.saveAs(content, original.name + '.zip');
     });
-    */
     this.batchResult.sheets[original.name].trueCheckedCertainties = trueCertainTies;
     this.batchResult.sheets[original.name].falseCheckedCertainties = falseCertainTies;
     this.batchResult.sheets[original.name].processingState = ProcessingState.DONE;
@@ -401,7 +402,7 @@ export class EvaluatorComponent implements OnInit {
       const question = this.examManager.exam.questions[i];
       let markIndex = 0;
       for (const element of question.elements) {
-        if (typeof element === 'object' && 'question' in element) {
+        if (typeof element === 'object' && 'answer' in element) {
           if (sheet.trueCheckedCertainties[i][markIndex] >= certaintyThreshold &&
             sheet.falseCheckedCertainties[i][markIndex] >= certaintyThreshold) {
             sheet.answerStates[i].push(AnswerState.WRONG);
@@ -414,8 +415,12 @@ export class EvaluatorComponent implements OnInit {
               answer = true;
             } else if (sheet.falseCheckedCertainties[i][markIndex] >= certaintyThreshold) {
               answer = false;
+            } else {
+              answer = undefined;
             }
-            if (answer === element.answer) {
+            if (answer === undefined) {
+              sheet.answerStates[i].push(AnswerState.MANUAL_INTERVENTION_NECESSARY);
+            } else if (answer === element.answer) {
               sheet.answerStates[i].push(AnswerState.CORRECT);
             } else {
               sheet.answerStates[i].push(AnswerState.WRONG);

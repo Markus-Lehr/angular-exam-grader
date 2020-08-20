@@ -33,7 +33,7 @@ export class ElementEditorComponent implements OnInit {
     if (typeof this.question.elements[this.elementIndex] === 'object' && 'base64string' in this.question.elements[this.elementIndex]) {
       return this.types.Image;
     } else { // @ts-ignore
-      if (typeof this.question.elements[this.elementIndex] === 'object' && 'question' in this.question.elements[this.elementIndex]) {
+      if (typeof this.question.elements[this.elementIndex] === 'object' && 'answer' in this.question.elements[this.elementIndex]) {
         return this.types.Subquestion;
       }
     }
