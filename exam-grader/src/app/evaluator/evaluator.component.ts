@@ -72,7 +72,7 @@ export class EvaluatorComponent implements OnInit {
 
     this.route.paramMap.subscribe(params => {
       console.log(params);
-      this.examManager.loadExam(params.get('id'));
+      this.examManager.loadExam(Number(params.get('id')));
     });
     this.initOcr().then(() => {
       console.log('OCR initialized');

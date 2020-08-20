@@ -8,7 +8,7 @@
       <ng-container *ngFor="let question of page; index as j; trackBy: trackByFn" class="page">
         <div [class]="autoCompact ? 'question-body-wrapper' : 'question-body-wrapper-selector'">
           <h1>Question {{getQuestionNumber(i, j)}}:</h1>
-          <div *ngFor="let elem of question.elements; index as k; trackBy: trackByFn">
+          <div *ngFor="let elem of question?.elements || []; index as k; trackBy: trackByFn">
             <ng-container *ngIf="isText(elem)">
               <ng-katex-paragraph [paragraph]="elem"></ng-katex-paragraph>
             </ng-container>

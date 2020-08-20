@@ -1,6 +1,6 @@
 <button (click)="createNew()" mat-button>Create New Exam</button>
 
-<table [dataSource]="exams" mat-table>
+<table [dataSource]="store.examEntries" mat-table>
   <ng-container matColumnDef="examName">
     <th *matHeaderCellDef mat-header-cell>Name</th>
     <td *matCellDef="let exam" mat-cell> {{exam.examName}} </td>

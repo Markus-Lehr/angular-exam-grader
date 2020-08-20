@@ -26,6 +26,7 @@
     "aruco-marker": "^2.0.0",
     "file-saver": "^2.0.2",
     "html2canvas": "^1.0.0-rc.5",
+    "idb": "^5.0.4",
     "js-aruco": "^0.1.0",
     "jspdf": "^1.5.3",
     "jszip": "^3.5.0",

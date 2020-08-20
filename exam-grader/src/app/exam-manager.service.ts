@@ -13,7 +13,7 @@ const demoExam: Exam = FULL_EXAM;
 export class ExamManagerService {
   public modified = false;
   public exam: Exam = demoExam;
-  public lastExamId: string = undefined;
+  public lastExamId: number = undefined;
 
   public verticalFactor = 40;
   public horizontalFactor = 40;
@@ -110,16 +110,16 @@ export class ExamManagerService {
     return pts;
   }
 
-  loadExam(examId: string): void {
+  async loadExam(examId: number): Promise<void> {
     this.lastExamId = examId;
-    this.exam = JSON.parse(localStorage.getItem(examId));
+    this.exam = await this.store.loadExam(examId);
     if (!this.exam) {
       this.generateNewExam(examId);
     }
   }
 
   public save(): void {
-    localStorage.setItem(this.exam.id || this.lastExamId, JSON.stringify(this.exam));
+    this.store.saveExam(this.exam);
     this.modified = false;
   }
 
@@ -147,7 +147,7 @@ export class ExamManagerService {
     this.fileReader.readAsText(file);
   }
 
-  private generateNewExam(examId: string): void {
+  private generateNewExam(examId: number): void {
     console.log('generating new exam');
     this.exam = {
       id: examId,

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {ExamListEntry, EXAMPLE_EXAM_LIST} from '../exam-list-entry';
-import {v4 as uuidv4} from 'uuid';
+import {ExamListEntry} from '../exam-list-entry';
 import {Router} from '@angular/router';
+import {StorageService} from "../storage.service";
 
 const EXAMS_KEY = 'exams';
 
@@ -11,34 +11,16 @@ const EXAMS_KEY = 'exams';
   styleUrls: ['./exam-list.component.scss']
 })
 export class ExamListComponent implements OnInit {
-  exams: ExamListEntry[] = [];
-  loadedExams: ExamListEntry[] = [];
   columnsToDisplay = ['examName', 'lastModified', 'id'];
 
-  constructor(private router: Router) {
+  constructor(private router: Router, public store: StorageService) {
   }
 
   ngOnInit(): void {
-    this.loadExamsFromStorage();
   }
 
-  createNew(): void {
-    const newExam: ExamListEntry = {
-      examName: 'New Exam',
-      id: uuidv4(),
-      lastModified: new Date()
-    };
-    this.loadedExams.push(newExam);
-    localStorage.setItem(EXAMS_KEY, JSON.stringify(this.loadedExams));
-    this.router.navigateByUrl('/exam/' + newExam.id);
-  }
-
-  private loadExamsFromStorage(): void {
-    this.exams = JSON.parse(localStorage.getItem(EXAMS_KEY));
-    if (!this.exams) {
-      this.exams = EXAMPLE_EXAM_LIST;
-    } else {
-      this.loadedExams = this.exams;
-    }
+  async createNew(): Promise<void> {
+    const generatedId = await this.store.createNewExam();
+    this.router.navigateByUrl('/exam/' + generatedId);
   }
 }

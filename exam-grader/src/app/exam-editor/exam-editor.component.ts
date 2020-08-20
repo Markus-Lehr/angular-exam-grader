@@ -17,7 +17,7 @@ export class ExamEditorComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       console.log(params);
       this.examId = params.get('id');
-      this.examManager.loadExam(this.examId);
+      this.examManager.loadExam(Number(this.examId));
     });
   }
 

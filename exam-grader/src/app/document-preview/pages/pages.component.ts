@@ -1,6 +1,6 @@
 import {
   AfterViewChecked,
-  AfterViewInit,
+  AfterViewInit, ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -23,7 +23,9 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
   questionSizes = new EventEmitter<DOMRect[]>();
   private lastSizes: DOMRect[] = [];
 
-  constructor(public examManager: ExamManagerService, private elem: ElementRef) {
+  constructor(public examManager: ExamManagerService,
+              private elem: ElementRef,
+              private changeDetector: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -42,6 +44,7 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
       sizes.push(questionRect);
     }
     this.questionSizes.emit(sizes);
+    this.changeDetector.detectChanges();
   }
 
   isText = (elem: QuestionBlock) => {
@@ -92,7 +95,7 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
     const pages = this.pages();
     let questionNumber = 1 + questionIndex;
     for (let i = 0; i < pageIndex; i++) {
-      questionNumber += pages[i].length;
+      questionNumber += pages[i]?.length || 0;
     }
     return questionNumber;
   }

@@ -21,7 +21,8 @@ export interface SubQuestion {
 }
 
 export interface Exam {
-  id: string;
+  lastModified?: Date;
+  id?: number;
   title: string;
   date: Date;
   questions: Question[];

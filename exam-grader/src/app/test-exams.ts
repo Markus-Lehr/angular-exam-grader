@@ -1,7 +1,7 @@
 import {Exam} from './exam';
 
 const DEMO_EXAM: Exam = {
-  id: 'demoexam',
+  id: 420,
   date: new Date(),
   title: 'Demo Exam',
   questions: [
@@ -34,7 +34,7 @@ const DEMO_EXAM: Exam = {
 
 
 export const FULL_EXAM: Exam = {
-  id: 'fullexam',
+  id: 69,
   date: new Date(),
   title: 'Demo Exam',
   questions: [
