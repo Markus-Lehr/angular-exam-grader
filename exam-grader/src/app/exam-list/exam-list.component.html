@@ -1,4 +1,4 @@
-<button (click)="createNew()" mat-button>Create New Exam</button>
+<button (click)="createNew()" color="accent" mat-raised-button class="new-exam-button">Create New Exam</button>
 
 <table [dataSource]="store.examEntries" mat-table>
   <ng-container matColumnDef="examName">

@@ -77,6 +77,7 @@ export class StorageService {
   public async saveExam(exam: Exam): Promise<any> {
     const tx = this.db.transaction(DB_EXAM_STORE_NAME, 'readwrite');
     const store = tx.objectStore(DB_EXAM_STORE_NAME);
+    exam.lastModified = new Date();
     const res = await store.put(exam);
     this.initExamList();
     return res;
@@ -95,7 +96,6 @@ export class StorageService {
 
   public async createNewExam(): Promise<any> {
     const exam: Exam = {
-      lastModified: new Date(),
       date: new Date(),
       questions: [],
       title: 'New Exam'
