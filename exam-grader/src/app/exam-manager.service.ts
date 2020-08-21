@@ -1,16 +1,19 @@
 import {Injectable} from '@angular/core';
 import {Exam, Question} from './exam';
 import {Point} from '@angular/cdk/drag-drop';
-import {FULL_EXAM} from './test-exams';
 import * as FileSaver from 'file-saver';
-import {StorageService} from "./storage.service";
+import {StorageService} from './storage.service';
 
-const demoExam: Exam = FULL_EXAM;
+const demoExam: Exam = {
+  customPdfs: [], date: undefined, elementOrder: [], questions: [], title: ''
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExamManagerService {
+  public static instance: ExamManagerService = undefined;
+
   public modified = false;
   public exam: Exam = demoExam;
   public lastExamId: number = undefined;
@@ -25,6 +28,7 @@ export class ExamManagerService {
 
   constructor(private store: StorageService) {
     this.fileReader = new FileReader();
+    ExamManagerService.instance = this;
   }
 
 
@@ -152,7 +156,7 @@ export class ExamManagerService {
     this.exam = {
       id: examId,
       date: new Date(),
-      questions: [],
+      questions: [], customPdfs: [], elementOrder: [],
       title: 'New Exam'
     };
   }

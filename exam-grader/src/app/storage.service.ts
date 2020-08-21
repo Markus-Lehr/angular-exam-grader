@@ -1,52 +1,45 @@
 import {Injectable} from '@angular/core';
 import * as idb from 'idb';
 import {IDBPCursorWithValue, OpenDBCallbacks} from 'idb';
-import {IDBPDatabase, IDBPTransaction} from "idb/build/esm/entry";
-import {Exam} from "./exam";
-import {ExamListEntry} from "./exam-list-entry";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {IDBPDatabase, IDBPTransaction} from 'idb/build/esm/entry';
+import {Exam} from './exam';
+import {ExamListEntry} from './exam-list-entry';
+import {BehaviorSubject} from 'rxjs';
 
-const DB_NAME: string = 'db1'
-const DB_VERSION: number = 2;
+const DB_NAME = 'db1';
+const DB_VERSION = 2;
 
-const DB_EXAM_STORE_NAME: string = 'exams'
+const DB_EXAM_STORE_NAME = 'exams';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
 
-  private db: IDBPDatabase<any> = undefined;
   public examEntries: BehaviorSubject<ExamListEntry[]> = new BehaviorSubject<ExamListEntry[]>([]);
-
+  private db: IDBPDatabase<any> = undefined;
   private collectedEntries: ExamListEntry[] = [];
 
   constructor() {
     this.setupDatabase();
   }
 
-  async setupDatabase() {
-    //check for support
+  async setupDatabase(): Promise<void> {
+    // check for support
     if (!('indexedDB' in window)) {
       console.error('This browser doesn\'t support IndexedDB');
-      //TODO throw error
+      // TODO throw error
       return;
     }
 
     const openDBCallbacks: OpenDBCallbacks<any> = {
       upgrade: this.upgrade,
-    }
+    };
 
     idb.openDB(DB_NAME, DB_VERSION, openDBCallbacks).then(database => {
       this.db = database;
       this.initExamList();
     });
-  }
-
-  private upgrade(database: IDBPDatabase, oldVersion: number, newVersion: number | null, transaction: IDBPTransaction): void {
-    if (!database.objectStoreNames.contains(DB_EXAM_STORE_NAME)) {
-      database.createObjectStore(DB_EXAM_STORE_NAME, {keyPath: 'id', autoIncrement: true});
-    }
   }
 
   manageCursor(cursor: IDBPCursorWithValue<any, [string], string> | null):
@@ -61,17 +54,6 @@ export class StorageService {
       id: exam.id
     });
     return cursor.continue().then(this.manageCursor.bind(this));
-  }
-
-  private initExamList() {
-    this.collectedEntries = [];
-    const tx = this.db.transaction(DB_EXAM_STORE_NAME, 'readonly');
-    const store = tx.objectStore(DB_EXAM_STORE_NAME);
-
-    store.openCursor().then(this.manageCursor.bind(this)).then(() => {
-      console.log('Finished iterating exam list', this.collectedEntries);
-      this.examEntries.next(this.collectedEntries)
-    });
   }
 
   public async saveExam(exam: Exam): Promise<any> {
@@ -91,21 +73,88 @@ export class StorageService {
     if (exam) {
       exam.id = id;
     }
-    return exam;
+    return await this.evaluateAndFix(exam);
   }
 
   public async createNewExam(): Promise<any> {
     const exam: Exam = {
       date: new Date(),
-      questions: [],
+      customPdfs: [], elementOrder: [], questions: [],
       title: 'New Exam'
     };
     return await this.saveExam(exam);
   }
 
+  private upgrade(database: IDBPDatabase, oldVersion: number, newVersion: number | null, transaction: IDBPTransaction): void {
+    if (!database.objectStoreNames.contains(DB_EXAM_STORE_NAME)) {
+      database.createObjectStore(DB_EXAM_STORE_NAME, {keyPath: 'id', autoIncrement: true});
+    }
+  }
+
+  private initExamList(): void {
+    this.collectedEntries = [];
+    const tx = this.db.transaction(DB_EXAM_STORE_NAME, 'readonly');
+    const store = tx.objectStore(DB_EXAM_STORE_NAME);
+
+    store.openCursor().then(this.manageCursor.bind(this)).then(() => {
+      console.log('Finished iterating exam list', this.collectedEntries);
+      this.examEntries.next(this.collectedEntries);
+    });
+  }
+
   private async waitForDb(): Promise<void> {
-    while(!this.db) {
+    while (!this.db) {
       await new Promise(resolve => setTimeout(resolve, 200));
+    }
+  }
+
+  private async evaluateAndFix(exam: Exam): Promise<Exam> {
+    let changed = false;
+    if (!exam.elementOrder) {
+      exam.elementOrder = [];
+      changed = true;
+    }
+
+    const elementCount = (exam.questions?.length || 0) + (exam.customPdfs?.length || 0);
+    const pageBreaks = exam.elementOrder.map(entry => Number(entry.type === 'page-break' ? 1 : 0)).reduce((a, b) => a + b, 0) || 0;
+    if (elementCount + pageBreaks !== exam.elementOrder.length) {
+      console.log('there are not as many elements as there are list entries. Fixing that');
+      changed = true;
+      exam.elementOrder = [];
+      if (!exam.questions) {
+        exam.questions = [];
+      }
+      for (let i = 0; i < exam.questions.length; i++) {
+        const question = exam.questions[i];
+        exam.elementOrder.push({
+          type: 'question',
+          index: i
+        });
+      }
+      if (!exam.customPdfs) {
+        exam.customPdfs = [];
+      }
+      for (let i = 0; i < exam.customPdfs.length; i++) {
+        const customPdf = exam.customPdfs[i];
+        exam.elementOrder.push({
+          type: 'question',
+          index: i
+        });
+      }
+    }
+
+    for (const question of exam.questions) {
+      if (!question.id || typeof question.id !== 'number') {
+        changed = true;
+        question.id = Math.round(Math.random() * 100000);
+      }
+    }
+
+    if (changed) {
+      await this.saveExam(exam);
+      return exam;
+    } else {
+      return exam;
     }
   }
 }

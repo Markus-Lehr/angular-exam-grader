@@ -1,18 +1,32 @@
-<input #uploadJsonInput (change)="examManager.import($event.target.files)" hidden type="file">
-<div class="buttons">
-  <button (click)="examManager.save()" [disabled]="!examManager.modified" color="primary" mat-raised-button>Save
-  </button>
-  <button (click)="examManager.export($event)" mat-raised-button>Export .json</button>
-  <button (click)="uploadJsonInput.click()" mat-raised-button>Import .json</button>
+<mat-card class="management-interface">
+  <input #uploadJsonInput (change)="examManager.import($event.target.files)" hidden type="file">
+  <div class="buttons management-row">
+    <button (click)="examManager.save()" [disabled]="!examManager.modified" color="primary" mat-raised-button>Save
+    </button>
+    <button (click)="examManager.export($event)" mat-raised-button>Export .json</button>
+    <button (click)="uploadJsonInput.click()" mat-raised-button>Import .json</button>
+    <button (click)="convertExamType()" mat-raised-button>Convert
+      to {{examManager.exam.markingSheetOnly ? 'whole exam editor' : 'Mark-Sheet only'}}</button>
+  </div>
+  <mat-form-field class="management-row">
+    <mat-label>Exam Name</mat-label>
+    <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.title" matInput>
+  </mat-form-field>
+  <mat-form-field class="management-row">
+    <mat-label>Exam Date</mat-label>
+    <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.date" matInput type="date">
+  </mat-form-field>
+  <p class="management-row">
+    Add new Element:
+    <mat-button-toggle-group aria-label="Font Style" name="fontStyle">
+      <mat-button-toggle (click)="createQuestion()">Question</mat-button-toggle>
+      <mat-button-toggle (click)="createPageBreak()">Page break</mat-button-toggle>
+      <mat-button-toggle>Custom PDF</mat-button-toggle>
+    </mat-button-toggle-group>
+  </p>
+</mat-card>
+<div *ngIf="!!examManager" class="question-list">
+  <app-question-editor (toggle)="manageToggle($event)"
+                       *ngFor="let element of examManager.exam.elementOrder; index as i; trackBy: trackByFn;" [activeIndex]="activeIndex" [elementIndex]="i"
+                       [element]="element"></app-question-editor>
 </div>
-<mat-form-field>
-  <mat-label>Exam Name</mat-label>
-  <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.title" matInput>
-</mat-form-field>
-<mat-form-field>
-  <mat-label>Exam Date</mat-label>
-  <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.date" matInput type="date">
-</mat-form-field>
-<button (click)="createQuestion()" mat-button>New Question</button>
-<app-question-editor *ngFor="let question of examManager.exam.questions; index as i; trackBy: trackByFn;"
-                     [index]="i" [question]="question"></app-question-editor>

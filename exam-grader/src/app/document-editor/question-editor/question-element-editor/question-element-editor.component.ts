@@ -5,10 +5,10 @@ import {ExamManagerService} from '../../../exam-manager.service';
 
 @Component({
   selector: 'app-element-editor',
-  templateUrl: './element-editor.component.html',
-  styleUrls: ['./element-editor.component.scss']
+  templateUrl: './question-element-editor.component.html',
+  styleUrls: ['./question-element-editor.component.scss']
 })
-export class ElementEditorComponent implements OnInit {
+export class QuestionElementEditorComponent implements OnInit {
   types = QuestionBlockTypes;
   @Input()
   question: Question = {elements: [], points: 0};

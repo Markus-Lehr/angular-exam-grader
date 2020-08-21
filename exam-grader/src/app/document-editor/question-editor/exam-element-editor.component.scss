@@ -3,8 +3,12 @@
   flex-direction: column;
 }
 
-.question-card-header {
+.exam-element-card-header {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.visibility-toggle {
+  cursor: pointer;
 }

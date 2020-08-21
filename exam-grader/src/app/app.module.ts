@@ -16,9 +16,9 @@ import {ExamEditorComponent} from './exam-editor/exam-editor.component';
 import {MatTableModule} from '@angular/material/table';
 import {MatInputModule} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
-import {QuestionEditorComponent} from './document-editor/question-editor/question-editor.component';
+import {ExamElementEditorComponent} from './document-editor/question-editor/exam-element-editor.component';
 import {MatCardModule} from '@angular/material/card';
-import {ElementEditorComponent} from './document-editor/question-editor/element-editor/element-editor.component';
+import {QuestionElementEditorComponent} from './document-editor/question-editor/question-element-editor/question-element-editor.component';
 import {MatSelectModule} from '@angular/material/select';
 import {KatexModule} from 'ng-katex';
 import {PageHeaderComponent} from './document-preview/page-header/page-header.component';
@@ -30,6 +30,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatTabsModule} from '@angular/material/tabs';
 import {LoadingScreenComponent} from './loading-screen/loading-screen.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 
 @NgModule({
@@ -40,8 +41,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     MarkingSheetComponent,
     ExamListComponent,
     ExamEditorComponent,
-    QuestionEditorComponent,
-    ElementEditorComponent,
+    ExamElementEditorComponent,
+    QuestionElementEditorComponent,
     PageHeaderComponent,
     PagesComponent,
     PageFooterComponent,
@@ -66,7 +67,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     MatDialogModule,
     MatListModule,
     MatTabsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatButtonToggleModule
   ],
   providers: [],
   bootstrap: [AppComponent]

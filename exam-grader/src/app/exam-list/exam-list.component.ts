@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {ExamListEntry} from '../exam-list-entry';
 import {Router} from '@angular/router';
-import {StorageService} from "../storage.service";
+import {StorageService} from '../storage.service';
 
 const EXAMS_KEY = 'exams';
 

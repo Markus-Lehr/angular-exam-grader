@@ -10,10 +10,25 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  flex-wrap: wrap;
+
+  button {
+    margin-bottom: 10px;
+  }
 }
 
-* {
-  margin-top: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
+.management-interface {
+  width: 80%;
+  margin: 20px;
+
+  .management-row {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+.question-list {
+  overflow-y: scroll;
+  margin: 20px;
 }

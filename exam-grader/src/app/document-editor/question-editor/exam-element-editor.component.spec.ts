@@ -1,20 +1,20 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ElementEditorComponent} from './element-editor.component';
+import {ExamElementEditorComponent} from './exam-element-editor.component';
 
-describe('ElementEditorComponent', () => {
-  let component: ElementEditorComponent;
-  let fixture: ComponentFixture<ElementEditorComponent>;
+describe('QuestionEditorComponent', () => {
+  let component: ExamElementEditorComponent;
+  let fixture: ComponentFixture<ExamElementEditorComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ElementEditorComponent]
+      declarations: [ExamElementEditorComponent]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ElementEditorComponent);
+    fixture = TestBed.createComponent(ExamElementEditorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
