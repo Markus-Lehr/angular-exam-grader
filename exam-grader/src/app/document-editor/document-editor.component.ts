@@ -58,4 +58,13 @@ export class DocumentEditorComponent implements OnInit {
     });
     this.examManager.modified = true;
   }
+
+  createPdf(): void {
+    this.examManager.exam.customPdfs.push(-1);
+    this.examManager.exam.elementOrder.push({
+      type: 'pdf',
+      index: this.examManager.exam.customPdfs.length - 1,
+    });
+    this.examManager.modified = true;
+  }
 }

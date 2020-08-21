@@ -1,24 +1,29 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ElementListEntry, Question} from '../../exam';
 import {ExamManagerService} from '../../exam-manager.service';
+import {StorageService} from '../../storage.service';
+import {LoadingService} from '../../loading-screen/loading.service';
+import {SafeUrl} from '@angular/platform-browser';
 
+// noinspection DuplicatedCode
 @Component({
-  selector: 'app-question-editor',
+  selector: 'app-exam-element-editor',
   templateUrl: './exam-element-editor.component.html',
   styleUrls: ['./exam-element-editor.component.scss']
 })
 export class ExamElementEditorComponent implements OnInit {
   question: Question;
   pdf: number;
+  blobURL: SafeUrl = undefined;
 
   @Input()
   elementIndex = -1;
-  @Input()
-  activeIndex = -1;
   @Output()
   toggle = new EventEmitter<number>();
+  @Output()
+  moved = new EventEmitter<number>();
 
-  constructor(private examManager: ExamManagerService) {
+  constructor(private examManager: ExamManagerService, private store: StorageService, private loading: LoadingService) {
   }
 
   // tslint:disable-next-line:variable-name
@@ -36,6 +41,17 @@ export class ExamElementEditorComponent implements OnInit {
       this.question = this.examManager.exam.questions[val.index];
     } else if (val.type === 'pdf') {
       this.pdf = this.examManager.exam.customPdfs[val.index];
+    }
+  }
+
+  // tslint:disable-next-line:variable-name
+  _activeIndex = -1;
+
+  @Input()
+  set activeIndex(val: number) {
+    this._activeIndex = val;
+    if (this._activeIndex !== -1 && this._activeIndex === this.elementIndex) {
+      this.setDataUrl();
     }
   }
 
@@ -108,6 +124,7 @@ export class ExamElementEditorComponent implements OnInit {
         [this.examManager.exam.elementOrder[this.elementIndex + direction], this.examManager.exam.elementOrder[this.elementIndex]];
     }
     console.log(this.examManager.exam);
+    this.moved.emit(direction);
     this.examManager.modified = true;
   }
 
@@ -124,5 +141,28 @@ export class ExamElementEditorComponent implements OnInit {
         prefix = 'Page Break ';
     }
     return prefix + (this._element.index + 1);
+  }
+
+  importPdf(files: any): void {
+    if (files.length !== 1) {
+      return;
+    }
+    const file: File = files.item(0);
+    console.log(file);
+
+    this.loading.show = true;
+    this.store.saveBlob(file).then(id => {
+      this.loading.show = false;
+      this.examManager.exam.customPdfs[this._element.index] = id;
+      this.pdf = id;
+      this.setDataUrl();
+    });
+  }
+
+  private async setDataUrl(): Promise<void> {
+    if (this._element.type === 'pdf') {
+      this.blobURL = await this.store.getBlobAsURL(this.examManager.exam.customPdfs[this._element.index]);
+      console.log(this.blobURL);
+    }
   }
 }

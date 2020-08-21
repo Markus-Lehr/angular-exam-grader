@@ -84,7 +84,7 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
           currentPage.push(this.examManager.exam.questions[questionIndex]);
           questionIndex++;
         } else if (elem.type === 'pdf') {
-          console.log('TODO: Append pdf');
+          // TODO: Append pdf
         } else {
           // break page
           currentPageSize = 0;

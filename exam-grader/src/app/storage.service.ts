@@ -1,15 +1,17 @@
-import {Injectable} from '@angular/core';
+import {Injectable, SecurityContext} from '@angular/core';
 import * as idb from 'idb';
 import {IDBPCursorWithValue, OpenDBCallbacks} from 'idb';
 import {IDBPDatabase, IDBPTransaction} from 'idb/build/esm/entry';
 import {Exam} from './exam';
 import {ExamListEntry} from './exam-list-entry';
 import {BehaviorSubject} from 'rxjs';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 
 const DB_NAME = 'db1';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 const DB_EXAM_STORE_NAME = 'exams';
+const DB_BLOB_STORE_NAME = 'blobs';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +22,7 @@ export class StorageService {
   private db: IDBPDatabase<any> = undefined;
   private collectedEntries: ExamListEntry[] = [];
 
-  constructor() {
+  constructor(private domSanitizer: DomSanitizer) {
     this.setupDatabase();
   }
 
@@ -76,6 +78,15 @@ export class StorageService {
     return await this.evaluateAndFix(exam);
   }
 
+  public async getBlobAsURL(id: number): Promise<SafeUrl> {
+    await this.waitForDb();
+    const tx = this.db.transaction(DB_BLOB_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(DB_BLOB_STORE_NAME);
+    const blob = await store.get(id);
+    return blob ? this.domSanitizer.sanitize(SecurityContext.RESOURCE_URL,
+      this.domSanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob))) : undefined;
+  }
+
   public async createNewExam(): Promise<any> {
     const exam: Exam = {
       date: new Date(),
@@ -85,9 +96,18 @@ export class StorageService {
     return await this.saveExam(exam);
   }
 
+  public async saveBlob(file: File): Promise<number> {
+    const tx = this.db.transaction(DB_BLOB_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(DB_BLOB_STORE_NAME);
+    return store.put(file);
+  }
+
   private upgrade(database: IDBPDatabase, oldVersion: number, newVersion: number | null, transaction: IDBPTransaction): void {
     if (!database.objectStoreNames.contains(DB_EXAM_STORE_NAME)) {
       database.createObjectStore(DB_EXAM_STORE_NAME, {keyPath: 'id', autoIncrement: true});
+    }
+    if (!database.objectStoreNames.contains(DB_BLOB_STORE_NAME)) {
+      database.createObjectStore(DB_BLOB_STORE_NAME, {autoIncrement: true});
     }
   }
 

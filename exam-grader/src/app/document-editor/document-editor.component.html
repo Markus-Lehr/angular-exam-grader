@@ -21,12 +21,12 @@
     <mat-button-toggle-group aria-label="Font Style" name="fontStyle">
       <mat-button-toggle (click)="createQuestion()">Question</mat-button-toggle>
       <mat-button-toggle (click)="createPageBreak()">Page break</mat-button-toggle>
-      <mat-button-toggle>Custom PDF</mat-button-toggle>
+      <mat-button-toggle (click)="createPdf()">Custom PDF</mat-button-toggle>
     </mat-button-toggle-group>
   </p>
 </mat-card>
 <div *ngIf="!!examManager" class="question-list">
-  <app-question-editor (toggle)="manageToggle($event)"
-                       *ngFor="let element of examManager.exam.elementOrder; index as i; trackBy: trackByFn;" [activeIndex]="activeIndex" [elementIndex]="i"
-                       [element]="element"></app-question-editor>
+  <app-exam-element-editor (toggle)="manageToggle($event)"
+                           *ngFor="let element of examManager.exam.elementOrder; index as i; trackBy: trackByFn;" [activeIndex]="activeIndex" [elementIndex]="i"
+                           [element]="element" (moved)="activeIndex = -1"></app-exam-element-editor>
 </div>
