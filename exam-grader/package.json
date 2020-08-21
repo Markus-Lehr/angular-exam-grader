@@ -30,6 +30,7 @@
     "js-aruco": "^0.1.0",
     "jspdf": "^1.5.3",
     "jszip": "^3.5.0",
+    "memoizee": "^0.4.14",
     "ng-katex": "^2.0.3",
     "ng2-pdf-viewer": "^6.3.2",
     "perspective-transform": "^1.1.3",

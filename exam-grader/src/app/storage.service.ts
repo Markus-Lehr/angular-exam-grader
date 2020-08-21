@@ -6,6 +6,7 @@ import {Exam} from './exam';
 import {ExamListEntry} from './exam-list-entry';
 import {BehaviorSubject} from 'rxjs';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {memoize} from './memoize';
 
 const DB_NAME = 'db1';
 const DB_VERSION = 3;
@@ -78,6 +79,7 @@ export class StorageService {
     return await this.evaluateAndFix(exam);
   }
 
+  @memoize()
   public async getBlobAsURL(id: number): Promise<SafeUrl> {
     await this.waitForDb();
     const tx = this.db.transaction(DB_BLOB_STORE_NAME, 'readwrite');

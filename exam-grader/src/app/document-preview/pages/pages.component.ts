@@ -11,6 +11,14 @@ import {
 } from '@angular/core';
 import {ExamManagerService} from '../../exam-manager.service';
 import {Question, QuestionBlock} from '../../exam';
+import {SafeUrl} from '@angular/platform-browser';
+
+export interface Page {
+  type: 'questions' | 'pdf' | 'blank';
+  questions?: Question[];
+  pdfUrl?: SafeUrl;
+  pdfPage?: number;
+}
 
 @Component({
   selector: 'app-pages',
@@ -64,24 +72,30 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
     return index;
   }
 
-  pages(): Question[][] {
+  pages(): Page[] {
     if (this.autoCompact) {
-      const pages = [];
-      let currentPage: Question[] = [];
+      const pages: Page[] = [];
+      let currentPage: Page = {type: 'blank'};
       let currentPageSize = 0;
       const maxPageHeight = 1400;
 
       let questionIndex = 0;
       for (const elem of this.examManager.exam.elementOrder) {
         if (elem.type === 'question') {
+          if (!currentPage || currentPage.type === 'blank') {
+            currentPage = {type: 'questions', questions: []};
+          }
           const questionSize = this.lastSizes[questionIndex] || {height: 0};
           if (currentPageSize + questionSize.height > maxPageHeight) {
             currentPageSize = 0;
             pages.push(currentPage);
-            currentPage = [];
+            currentPage = {type: 'blank'};
           }
           currentPageSize += questionSize.height;
-          currentPage.push(this.examManager.exam.questions[questionIndex]);
+          if (!currentPage.questions) {
+            currentPage.questions = [];
+          }
+          currentPage.questions.push(this.examManager.exam.questions[questionIndex]);
           questionIndex++;
         } else if (elem.type === 'pdf') {
           // TODO: Append pdf
@@ -89,14 +103,19 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
           // break page
           currentPageSize = 0;
           pages.push(currentPage);
-          currentPage = [];
+          currentPage = {type: 'blank'};
         }
       }
       pages.push(currentPage);
       return pages;
 
     } else {
-      return this.examManager.exam.questions.map(q => [q]);
+      return this.examManager.exam.questions.map(q => {
+        return {
+          type: 'questions',
+          questions: [q]
+        };
+      });
     }
   }
 
@@ -108,7 +127,10 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
     const pages = this.pages();
     let questionNumber = 1 + questionIndex;
     for (let i = 0; i < pageIndex; i++) {
-      questionNumber += pages[i]?.length || 0;
+      const page: Page = pages[i];
+      if (page.type === 'questions') {
+        questionNumber += pages[i]?.questions?.length || 0;
+      }
     }
     return questionNumber;
   }

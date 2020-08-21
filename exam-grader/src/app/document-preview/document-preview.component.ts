@@ -136,8 +136,8 @@ export interface DownloadDialogData {
 
 @Component({
   selector: 'app-document-download-dialog',
-  templateUrl: 'document-download-dialog.html',
-  styleUrls: ['./document-download-dialog.scss']
+  templateUrl: 'document-download-dialog/document-download-dialog.html',
+  styleUrls: ['./document-download-dialog/document-download-dialog.scss']
 })
 export class DocumentDownloadDialogComponent {
 
