@@ -70,15 +70,27 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
       let currentPage: Question[] = [];
       let currentPageSize = 0;
       const maxPageHeight = 1400;
-      for (let i = 0; i < this.lastSizes.length; i++) {
-        const questionSize = this.lastSizes[i];
-        if (currentPageSize + questionSize.height > maxPageHeight) {
+
+      let questionIndex = 0;
+      for (const elem of this.examManager.exam.elementOrder) {
+        if (elem.type === 'question') {
+          const questionSize = this.lastSizes[questionIndex] || {height: 0};
+          if (currentPageSize + questionSize.height > maxPageHeight) {
+            currentPageSize = 0;
+            pages.push(currentPage);
+            currentPage = [];
+          }
+          currentPageSize += questionSize.height;
+          currentPage.push(this.examManager.exam.questions[questionIndex]);
+          questionIndex++;
+        } else if (elem.type === 'pdf') {
+          console.log('TODO: Append pdf');
+        } else {
+          // break page
           currentPageSize = 0;
           pages.push(currentPage);
           currentPage = [];
         }
-        currentPageSize += questionSize.height;
-        currentPage.push(this.examManager.exam.questions[i]);
       }
       pages.push(currentPage);
       return pages;

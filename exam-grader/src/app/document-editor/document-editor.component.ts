@@ -21,7 +21,7 @@ export class DocumentEditorComponent implements OnInit {
   trackByFn(index: number, el: ElementListEntry): number {
     if (el.type === 'question') {
       const question: Question = ExamManagerService.instance.exam.questions[el.index];
-      return question.id || index;
+      return question?.id || index;
     }
     return index;
   }

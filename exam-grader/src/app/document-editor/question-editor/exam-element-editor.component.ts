@@ -50,6 +50,27 @@ export class ExamElementEditorComponent implements OnInit {
     this.question.elements.push({question: undefined, answer: false});
   }
 
+  removeElement(): void {
+    if (this._element.type === 'question') {
+      for (let i = this.elementIndex + 1; i < this.examManager.exam.elementOrder.length; i++) {
+        const elementListEntry = this.examManager.exam.elementOrder[i];
+        if (elementListEntry.type === this._element.type) {
+          elementListEntry.index--;
+        }
+      }
+      this.examManager.exam.questions.splice(this._element.index, 1);
+    } else if (this._element.type === 'pdf') {
+      for (let i = this.elementIndex + 1; i < this.examManager.exam.elementOrder.length; i++) {
+        const elementListEntry = this.examManager.exam.elementOrder[i];
+        if (elementListEntry.type === this._element.type) {
+          elementListEntry.index--;
+        }
+      }
+      this.examManager.exam.customPdfs.splice(this._element.index, 1);
+    }
+    this.examManager.exam.elementOrder.splice(this.elementIndex, 1);
+  }
+
   collapse(): void {
     this.toggle.emit(this.elementIndex);
   }
@@ -84,7 +105,7 @@ export class ExamElementEditorComponent implements OnInit {
     } else {
       // different types' elements don't need to be swapped, only their pointers
       [this.examManager.exam.elementOrder[this.elementIndex], this.examManager.exam.elementOrder[this.elementIndex + direction]] =
-      [this.examManager.exam.elementOrder[this.elementIndex + direction], this.examManager.exam.elementOrder[this.elementIndex]];
+        [this.examManager.exam.elementOrder[this.elementIndex + direction], this.examManager.exam.elementOrder[this.elementIndex]];
     }
     console.log(this.examManager.exam);
     this.examManager.modified = true;

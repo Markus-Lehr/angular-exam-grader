@@ -13,9 +13,11 @@
     <app-element-editor *ngFor="let elem of question.elements; index as i;trackBy: trackByFn" [elementIndex]="i"
                         [question]="question"></app-element-editor>
   </mat-card-content>
+  <mat-divider></mat-divider>
   <mat-card-actions>
-    <button (click)="move(-1)" mat-button>Move up</button>
-    <button (click)="move(1)" mat-button>Move down</button>
-    <button (click)="addElement()" mat-button>Add Element</button>
+    <button (click)="move(-1)" mat-raised-button>Move up</button>
+    <button (click)="move(1)" mat-raised-button>Move down</button>
+    <button (click)="addElement()" mat-raised-button>Add Element</button>
+    <button (click)="removeElement()" color="warn" mat-button>Remove Element</button>
   </mat-card-actions>
 </mat-card>
