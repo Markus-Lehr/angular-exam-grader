@@ -10,14 +10,13 @@ import {
   Output
 } from '@angular/core';
 import {ExamManagerService} from '../../exam-manager.service';
-import {Question, QuestionBlock} from '../../exam';
-import {SafeUrl} from '@angular/platform-browser';
+import {PdfEntry, Question, QuestionBlock} from '../../exam';
 import {StorageService} from '../../storage.service';
 
 export interface Page {
   type: 'questions' | 'pdf';
   questions?: Question[];
-  pdfId?: number;
+  pdf?: PdfEntry;
   pdfPage?: number;
 }
 
@@ -31,7 +30,6 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
   autoCompact = false;
   @Output()
   questionSizes = new EventEmitter<DOMRect[]>();
-  public pdfUrls: { [key: number]: SafeUrl } = {};
   pages: Page[] = [];
   private lastSizes: DOMRect[] = [];
 
@@ -112,24 +110,20 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
           currentPage.questions.push(this.examManager.exam.questions[questionIndex]);
           questionIndex++;
         } else if (elem.type === 'pdf') {
-          const pdfId = this.examManager.exam.customPdfs[elem.index].id;
-          console.log(pdfId);
-          if (!this.pdfUrls[pdfId]) {
-            this.store.getBlobAsURL(pdfId).then(url => {
-              console.log('Got PDF', pdfId, 'as url', url);
-              this.pdfUrls[pdfId] = url;
-            });
-          }
+          const pdf = this.examManager.exam.customPdfs[elem.index];
+          console.log(pdf);
           if (currentPageSize > 0) {
-            pages.push(currentPage);
+            currentPageSize = 0;
           }
-          // break page
-          currentPageSize = 0;
-          currentPage = {
-            type: 'pdf',
-            pdfId,
-            pdfPage: 1
-          };
+          for (let i = 0; i < pdf?.pages || 0; i++) {
+            // break page
+            pages.push(currentPage);
+            currentPage = {
+              type: 'pdf',
+              pdf: pdf,
+              pdfPage: i + 1
+            };
+          }
           // this.store.getPDFPages(this.examManager.exam.customPdfs[elem.index]).then(numPages => console.log(numPages));
         } else {
           if (currentPageSize > 0) {

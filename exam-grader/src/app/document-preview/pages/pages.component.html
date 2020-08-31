@@ -24,8 +24,9 @@
         </ng-container>
       </ng-container>
       <ng-container *ngIf="page.type === 'pdf'">
-        <pdf-viewer class="pdf-preview" *ngIf="!!pdfUrls[page.pdfId]" [src]="pdfUrls[page.pdfId]" [render-text]="true" [page]="1"
-                    [stick-to-page]="true" [zoom]="0.4" [show-all]="false"></pdf-viewer>
+        <pdf-viewer *ngIf="!!page.pdf?.url" [page]="page.pdfPage" [render-text]="true" [show-all]="false"
+                    [src]="page.pdf.url"
+                    [stick-to-page]="true" [zoom]="0.4" class="pdf-preview"></pdf-viewer>
       </ng-container>
     </div>
     <div class="space-consumer"></div>

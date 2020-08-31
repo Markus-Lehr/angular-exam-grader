@@ -15,11 +15,12 @@
                           [question]="question"></app-element-editor>
     </ng-container>
     <ng-container *ngIf="_element.type === 'pdf'">
-      <input #fileInput (change)="importPdf($event.target.files)" accept="application/pdf" multiple style="display: none"
+      <input #fileInput (change)="importPdf($event.target.files)" accept="application/pdf" multiple
+             style="display: none"
              type="file">
       <button (click)="fileInput.click()" mat-raised-button>Choose file</button>
-      <pdf-viewer class="pdf-preview" *ngIf="pdf.url" [src]="pdf.url" [render-text]="true" [page]="1"
-                  [stick-to-page]="true" [zoom]="0.4" [show-all]="false"></pdf-viewer>
+      <pdf-viewer *ngIf="pdf.url" [page]="1" [render-text]="true" [show-all]="false" [src]="pdf.url"
+                  [stick-to-page]="true" [zoom]="0.4" class="pdf-preview"></pdf-viewer>
     </ng-container>
   </mat-card-content>
   <mat-divider></mat-divider>

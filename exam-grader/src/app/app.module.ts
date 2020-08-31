@@ -31,7 +31,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {LoadingScreenComponent} from './loading-screen/loading-screen.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {PdfViewerModule} from "ng2-pdf-viewer";
+import {PdfViewerModule} from 'ng2-pdf-viewer';
 
 
 @NgModule({

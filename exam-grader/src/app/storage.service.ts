@@ -162,12 +162,12 @@ export class StorageService {
       changed = true;
     }
 
-    for (let i = 0; i < exam.customPdfs.length; i++){
+    for (let i = 0; i < exam.customPdfs.length; i++) {
       const customPdf = exam.customPdfs[i];
       if (typeof customPdf === 'number') {
         exam.customPdfs[i] = {
           id: customPdf
-        }
+        };
         changed = true;
       }
     }
