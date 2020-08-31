@@ -7,6 +7,8 @@ import {ExamListEntry} from './exam-list-entry';
 import {BehaviorSubject} from 'rxjs';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {memoize} from './memoize';
+import * as pdfjsLib from 'pdfjs-dist';
+import {PDFSource} from 'pdfjs-dist';
 
 const DB_NAME = 'db1';
 const DB_VERSION = 3;
@@ -77,6 +79,19 @@ export class StorageService {
       exam.id = id;
     }
     return await this.evaluateAndFix(exam);
+  }
+
+  @memoize()
+  public async getPDFPages(id: number): Promise<number> {
+    return 1;
+    await this.waitForDb();
+    const tx = this.db.transaction(DB_BLOB_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(DB_BLOB_STORE_NAME);
+    const blob = await store.get(id);
+    const source: PDFSource = {data: blob};
+    return pdfjsLib.getDocument(undefined).promise.then(doc => {
+      return doc.numPages;
+    });
   }
 
   @memoize()
