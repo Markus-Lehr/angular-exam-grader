@@ -1,9 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ElementListEntry, Question} from '../../exam';
+import {ElementListEntry, PdfEntry, Question} from '../../exam';
 import {ExamManagerService} from '../../exam-manager.service';
 import {StorageService} from '../../storage.service';
 import {LoadingService} from '../../loading-screen/loading.service';
-import {SafeUrl} from '@angular/platform-browser';
 
 // noinspection DuplicatedCode
 @Component({
@@ -13,8 +12,7 @@ import {SafeUrl} from '@angular/platform-browser';
 })
 export class ExamElementEditorComponent implements OnInit {
   question: Question;
-  pdf: number;
-  blobURL: SafeUrl = undefined;
+  pdf: PdfEntry;
 
   @Input()
   elementIndex = -1;
@@ -51,7 +49,7 @@ export class ExamElementEditorComponent implements OnInit {
   set activeIndex(val: number) {
     this._activeIndex = val;
     if (this._activeIndex !== -1 && this._activeIndex === this.elementIndex) {
-      this.setDataUrl();
+      this.store.populatePdfs(this.examManager.exam);
     }
   }
 
@@ -153,16 +151,11 @@ export class ExamElementEditorComponent implements OnInit {
     this.loading.show = true;
     this.store.saveBlob(file).then(id => {
       this.loading.show = false;
-      this.examManager.exam.customPdfs[this._element.index] = id;
-      this.pdf = id;
-      this.setDataUrl();
+      this.examManager.exam.customPdfs[this._element.index] = {
+        id
+      };
+      this.store.populatePdfs(this.examManager.exam);
+      this.pdf = this.examManager.exam.customPdfs[this._element.index];
     });
-  }
-
-  private async setDataUrl(): Promise<void> {
-    if (this._element.type === 'pdf') {
-      this.blobURL = await this.store.getBlobAsURL(this.examManager.exam.customPdfs[this._element.index]);
-      console.log(this.blobURL);
-    }
   }
 }

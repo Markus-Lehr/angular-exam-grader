@@ -112,11 +112,14 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
           currentPage.questions.push(this.examManager.exam.questions[questionIndex]);
           questionIndex++;
         } else if (elem.type === 'pdf') {
-          const pdfId = this.examManager.exam.customPdfs[elem.index];
+          const pdfId = this.examManager.exam.customPdfs[elem.index].id;
           console.log(pdfId);
-          /*this.store.getBlobAsURL(pdfId).then(url => {
-            this.pdfUrls[pdfId] = url;
-          });*/
+          if (!this.pdfUrls[pdfId]) {
+            this.store.getBlobAsURL(pdfId).then(url => {
+              console.log('Got PDF', pdfId, 'as url', url);
+              this.pdfUrls[pdfId] = url;
+            });
+          }
           if (currentPageSize > 0) {
             pages.push(currentPage);
           }

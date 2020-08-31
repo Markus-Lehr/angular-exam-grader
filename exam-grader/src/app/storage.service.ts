@@ -8,7 +8,6 @@ import {BehaviorSubject} from 'rxjs';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {memoize} from './memoize';
 import * as pdfjsLib from 'pdfjs-dist';
-import {PDFSource} from 'pdfjs-dist';
 
 const DB_NAME = 'db1';
 const DB_VERSION = 3;
@@ -78,20 +77,31 @@ export class StorageService {
     if (exam) {
       exam.id = id;
     }
+    this.populatePdfs(exam).then(() => {
+      // pass
+    });
     return await this.evaluateAndFix(exam);
   }
 
-  @memoize()
-  public async getPDFPages(id: number): Promise<number> {
-    return 1;
-    await this.waitForDb();
-    const tx = this.db.transaction(DB_BLOB_STORE_NAME, 'readwrite');
-    const store = tx.objectStore(DB_BLOB_STORE_NAME);
-    const blob = await store.get(id);
-    const source: PDFSource = {data: blob};
-    return pdfjsLib.getDocument(undefined).promise.then(doc => {
-      return doc.numPages;
-    });
+  public async populatePdfs(exam: Exam) {
+    for (const customPdf of exam.customPdfs) {
+      if (!!customPdf.url && !!customPdf.pages) {
+        continue;
+      }
+      if (customPdf.id < 0) {
+        continue;
+      }
+      customPdf.url = await this.getBlobAsURL(customPdf.id);
+      pdfjsLib.GlobalWorkerOptions.workerSrc = './assets/pdf.worker.js';
+      pdfjsLib.getDocument(customPdf.url).promise.then(doc => {
+        console.log('pdf document', doc);
+        console.log('number of pages', doc.numPages);
+        customPdf.pages = doc.numPages;
+        console.log(customPdf);
+      }, reason => {
+        console.log(reason);
+      });
+    }
   }
 
   @memoize()
@@ -150,6 +160,16 @@ export class StorageService {
     if (!exam.elementOrder) {
       exam.elementOrder = [];
       changed = true;
+    }
+
+    for (let i = 0; i < exam.customPdfs.length; i++){
+      const customPdf = exam.customPdfs[i];
+      if (typeof customPdf === 'number') {
+        exam.customPdfs[i] = {
+          id: customPdf
+        }
+        changed = true;
+      }
     }
 
     const elementCount = (exam.questions?.length || 0) + (exam.customPdfs?.length || 0);

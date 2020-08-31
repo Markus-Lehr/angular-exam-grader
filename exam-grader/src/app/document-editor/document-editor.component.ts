@@ -60,7 +60,7 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   createPdf(): void {
-    this.examManager.exam.customPdfs.push(-1);
+    this.examManager.exam.customPdfs.push({id: -1});
     this.examManager.exam.elementOrder.push({
       type: 'pdf',
       index: this.examManager.exam.customPdfs.length - 1,

@@ -1,4 +1,6 @@
 /* not in allcaps, since these strings are lazily used as labels in a dropdown */
+import {SafeUrl} from '@angular/platform-browser';
+
 export enum QuestionBlockTypes {
   Text, Image, Subquestion
 }
@@ -26,6 +28,12 @@ export interface SubQuestion {
   answer: boolean;
 }
 
+export interface PdfEntry {
+  id: number;
+  url?: SafeUrl;
+  pages?: number;
+}
+
 export interface Exam {
   lastModified?: Date;
   id?: number;
@@ -34,6 +42,6 @@ export interface Exam {
   markingSheetOnly?: boolean;
 
   questions: Question[];
-  customPdfs: number[]; // store pdf ids
+  customPdfs: PdfEntry[]; // store pdf ids
   elementOrder: ElementListEntry[]; // references to elements in other arrays
 }
