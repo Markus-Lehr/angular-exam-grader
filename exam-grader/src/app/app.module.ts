@@ -32,6 +32,7 @@ import {LoadingScreenComponent} from './loading-screen/loading-screen.component'
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {PdfViewerModule} from 'ng2-pdf-viewer';
+import { PdfPageDirective } from './document-preview/pages/pdf-page.directive';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import {PdfViewerModule} from 'ng2-pdf-viewer';
     PageFooterComponent,
     EvaluatorComponent,
     DocumentDownloadDialogComponent,
-    LoadingScreenComponent
+    LoadingScreenComponent,
+    PdfPageDirective
   ],
   imports: [
     BrowserModule,

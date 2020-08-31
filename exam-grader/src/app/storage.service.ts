@@ -85,9 +85,6 @@ export class StorageService {
 
   public async populatePdfs(exam: Exam) {
     for (const customPdf of exam.customPdfs) {
-      if (!!customPdf.url && !!customPdf.pages) {
-        continue;
-      }
       if (customPdf.id < 0) {
         continue;
       }

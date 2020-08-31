@@ -3,10 +3,9 @@
 
 <ng-container *ngFor="let page of pages; index as i; trackBy: trackByFn" class="page">
   <div class="content-wrapper">
-    <app-page-header></app-page-header>
-    <p>{{page.type}}</p>
-    <div class="inner-content-wrapper">
-      <ng-container *ngIf="page.type === 'questions'">
+    <ng-container *ngIf="page.type === 'questions'">
+      <app-page-header></app-page-header>
+      <div class="inner-content-wrapper">
         <ng-container *ngFor="let question of page.questions; index as j; trackBy: trackByFn" class="page">
           <div [class]="autoCompact ? 'question-body-wrapper' : 'question-body-wrapper-selector'">
             <h1>Question {{getQuestionNumber(i, j)}}:</h1>
@@ -22,13 +21,16 @@
             </div>
           </div>
         </ng-container>
-      </ng-container>
-      <ng-container *ngIf="page.type === 'pdf'">
-        <pdf-viewer *ngIf="!!page.pdf?.url" [page]="page.pdfPage" [render-text]="true" [show-all]="false"
-                    [src]="page.pdf.url"
-                    [stick-to-page]="true" [zoom]="0.4" class="pdf-preview"></pdf-viewer>
-      </ng-container>
-    </div>
-    <div class="space-consumer"></div>
+        <div class="space-consumer"></div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="page.type === 'pdf'">
+      <div *ngIf="!autoCompact">Placeholder for compacting</div>
+      <canvas *ngIf="autoCompact" class="pdf-preview" [page]="page"></canvas>
+      <!--pdf-viewer *ngIf="autoCompact && !!page.pdf?.url" [page]="page.pdfPage" [render-text]="true" [show-all]="false"
+                  [src]="page.pdf.url"
+                  [original-size]="false" [fit-to-page]="true" [autoresize]="true" [zoom-scale]="'page-fit'"
+                  class="pdf-preview"></pdf-viewer-->
+    </ng-container>
   </div>
 </ng-container>

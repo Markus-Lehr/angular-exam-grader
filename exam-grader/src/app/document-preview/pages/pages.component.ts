@@ -12,6 +12,9 @@ import {
 import {ExamManagerService} from '../../exam-manager.service';
 import {PdfEntry, Question, QuestionBlock} from '../../exam';
 import {StorageService} from '../../storage.service';
+import {PdfPageDirective} from './pdf-page.directive';
+import * as pdfjsLib from 'pdfjs-dist';
+import {getTransformedQueryCallExpr} from '@angular/core/schematics/migrations/static-queries/transform';
 
 export interface Page {
   type: 'questions' | 'pdf';
@@ -111,7 +114,6 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
           questionIndex++;
         } else if (elem.type === 'pdf') {
           const pdf = this.examManager.exam.customPdfs[elem.index];
-          console.log(pdf);
           if (currentPageSize > 0) {
             currentPageSize = 0;
           }
@@ -138,14 +140,23 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
         pages.push(currentPage);
       }
       this.pages = pages;
-      console.log(this.pages);
     } else {
-      this.pages = this.examManager.exam.questions.map(q => {
-        return {
-          type: 'questions',
-          questions: [q]
-        };
-      });
+      this.pages = [];
+      for (const element of this.examManager.exam.elementOrder) {
+        if (element.type === 'question') {
+          this.pages.push({
+            type: 'questions',
+            questions: [this.examManager.exam.questions[element.index]]
+          });
+        } else if (element.type === 'pdf') {
+          for (let i = 0; i < this.examManager.exam.customPdfs[element.index].pages; i++) {
+            this.pages.push({
+              type: 'pdf',
+              pdfPage: i + 1
+            });
+          }
+        }
+      }
     }
 
     setTimeout(() => {
@@ -167,5 +178,9 @@ export class PagesComponent implements OnInit, AfterViewInit, AfterViewChecked {
       }
     }
     return questionNumber;
+  }
+
+  renderPdfOnCanvas(event: PdfPageDirective, page: Page) {
+
   }
 }
