@@ -16,7 +16,7 @@
     <mat-label>Exam Date</mat-label>
     <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.date" matInput type="date">
   </mat-form-field>
-  <p class="management-row">
+  <p *ngIf="!examManager?.exam.markingSheetOnly" class="management-row">
     Add new Element:
     <mat-button-toggle-group aria-label="Font Style" name="fontStyle">
       <mat-button-toggle (click)="createQuestion()">Question</mat-button-toggle>
@@ -24,10 +24,37 @@
       <mat-button-toggle (click)="createPdf()">Custom PDF</mat-button-toggle>
     </mat-button-toggle-group>
   </p>
+  <p *ngIf="examManager?.exam.markingSheetOnly" class="management-row">
+    <button (click)="createQuestion()" mat-raised-button>Add Question</button>
+  </p>
 </mat-card>
-<div *ngIf="!!examManager" class="question-list">
+<div *ngIf="!!examManager && !examManager.exam.markingSheetOnly" class="question-list">
   <app-exam-element-editor (moved)="activeIndex = -1"
                            (toggle)="manageToggle($event)"
-                           *ngFor="let element of examManager.exam.elementOrder; index as i; trackBy: trackByFn;" [activeIndex]="activeIndex"
+                           *ngFor="let element of examManager.exam.elementOrder; index as i; trackBy: trackByFn;"
+                           [activeIndex]="activeIndex"
                            [elementIndex]="i" [element]="element"></app-exam-element-editor>
+</div>
+
+<div *ngIf="!!examManager && examManager.exam.markingSheetOnly">
+  <mat-card *ngFor="let question of examManager.exam.questions; index as i" class="question-mark-editing-entry">
+    <mat-card-header class="exam-element-card-header">
+      <mat-icon (click)="deleteQuestion(question, i)" class="visibility-toggle">delete</mat-icon>
+      <mat-card-title>Question {{i + 1}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field>
+        <mat-label>Number of answers</mat-label>
+        <input (change)="changeNumberOfAnswers($event, question)" [ngModel]="examManager.realMarks(question).length"
+               matInput max="10" min="1"
+               type="number">
+      </mat-form-field>
+      <div class="mark-checkbox-container">
+        <mat-checkbox (click)="toggleCheckbox(i,j)"
+                      *ngFor="let mark of examManager.realMarks(question); index as j" [disabled]="true"
+                      [labelPosition]="'before'"
+                      [checked]="mark" [disableRipple]="true">{{examManager.getChar(j)}}</mat-checkbox>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>

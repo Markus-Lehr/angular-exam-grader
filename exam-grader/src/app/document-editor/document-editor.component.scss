@@ -32,3 +32,17 @@
   overflow-y: scroll;
   margin: 20px;
 }
+
+.question-mark-editing-entry {
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  mat-icon:hover {
+    cursor: pointer;
+  }
+
+  mat-checkbox {
+    margin-right: 15px;
+  }
+}

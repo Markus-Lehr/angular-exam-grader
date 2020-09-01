@@ -90,6 +90,8 @@ export class ExamManagerService {
     for (const element of question.elements) {
       if (typeof element === 'object' && 'answer' in element) {
         markResults.push(element.answer);
+      } else if (typeof element === 'boolean') {
+        markResults.push(element);
       }
     }
     return markResults;

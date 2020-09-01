@@ -62,6 +62,7 @@ export class ExamElementEditorComponent implements OnInit {
 
   addElement(): void {
     this.question.elements.push({question: undefined, answer: false});
+    this.examManager.modified = true;
   }
 
   removeElement(): void {
@@ -83,6 +84,7 @@ export class ExamElementEditorComponent implements OnInit {
       this.examManager.exam.customPdfs.splice(this._element.index, 1);
     }
     this.examManager.exam.elementOrder.splice(this.elementIndex, 1);
+    this.examManager.modified = true;
   }
 
   collapse(): void {

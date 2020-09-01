@@ -21,7 +21,7 @@ export interface Image {
   base64string: string;
 }
 
-export type QuestionBlock = string | SubQuestion | Image;
+export type QuestionBlock = string | boolean | SubQuestion | Image;
 
 export interface SubQuestion {
   question: string;
