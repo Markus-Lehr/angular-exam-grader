@@ -54,7 +54,7 @@ export class EvaluatorComponent implements OnInit {
   private orcNameWorker: Worker;
 
   constructor(private route: ActivatedRoute,
-              private examManager: ExamManagerService,
+              public examManager: ExamManagerService,
               private tfEval: TensorflowCheckboxEvaluatorService,
               private pointCalculator: PointCalculatorService,
               private loading: LoadingService) {

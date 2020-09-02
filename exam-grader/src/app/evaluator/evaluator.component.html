@@ -1,7 +1,8 @@
 <div class="management-wrapper">
   <input #fileInput (change)="importFiles($event.target.files)" accept="image/*" multiple style="display: none"
          type="file">
-  <button (click)="fileInput.click()" mat-raised-button> Import Files</button>
+  <button (click)="fileInput.click()" mat-raised-button>Import Files</button>
+  <button [routerLink]="['/exam', examManager.exam.id]" mat-raised-button>Edit Exam</button>
   <mat-selection-list #fileSelectionList [multiple]="false">
     <mat-list-option *ngFor="let file of sheetNames" [value]="file">
       <mat-icon class="file-state-icon" mat-list-icon>{{iconForFile(file)}}</mat-icon>

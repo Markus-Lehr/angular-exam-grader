@@ -5,6 +5,7 @@
     </button>
     <button (click)="examManager.export($event)" mat-raised-button>Export .json</button>
     <button (click)="uploadJsonInput.click()" mat-raised-button>Import .json</button>
+    <button [routerLink]="['/evaluate', examManager.exam.id]" mat-raised-button>Grade Exam</button>
     <button (click)="convertExamType()" mat-raised-button>Convert
       to {{examManager.exam.markingSheetOnly ? 'whole exam editor' : 'Mark-Sheet only'}}</button>
   </div>
