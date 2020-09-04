@@ -13,8 +13,6 @@ import {ExamManagerService} from '../../exam-manager.service';
 import {PdfEntry, Question, QuestionBlock} from '../../exam';
 import {StorageService} from '../../storage.service';
 import {PdfPageDirective} from './pdf-page.directive';
-import * as pdfjsLib from 'pdfjs-dist';
-import {getTransformedQueryCallExpr} from '@angular/core/schematics/migrations/static-queries/transform';
 
 export interface Page {
   type: 'questions' | 'pdf';

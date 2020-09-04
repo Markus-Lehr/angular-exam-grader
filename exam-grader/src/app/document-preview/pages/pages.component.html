@@ -26,7 +26,7 @@
     </ng-container>
     <ng-container *ngIf="page.type === 'pdf'">
       <div *ngIf="!autoCompact">Placeholder for compacting</div>
-      <canvas *ngIf="autoCompact" class="pdf-preview" [page]="page"></canvas>
+      <canvas *ngIf="autoCompact" [page]="page" class="pdf-preview"></canvas>
       <!--pdf-viewer *ngIf="autoCompact && !!page.pdf?.url" [page]="page.pdfPage" [render-text]="true" [show-all]="false"
                   [src]="page.pdf.url"
                   [original-size]="false" [fit-to-page]="true" [autoresize]="true" [zoom-scale]="'page-fit'"

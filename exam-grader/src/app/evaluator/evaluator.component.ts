@@ -11,7 +11,6 @@ import {createWorker, OEM, PSM, Worker} from 'tesseract.js';
 import PerspT from 'perspective-transform';
 import {PointCalculatorService} from '../point-calculator.service';
 import {LoadingService} from '../loading-screen/loading.service';
-import {min} from 'rxjs/operators';
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -68,11 +67,11 @@ export class EvaluatorComponent implements OnInit {
 
   public batchResult: BatchResult = {sheets: {}};
   public sheetNames: string[] = [];
+  public gradingScheme: GradingScheme = {...DEFAULT_GRADING_SCHEME};
   private canvWidth = leftPadding + rightPadding;
   private canvHeight = topPadding + bottomPadding;
   private ocrDigitWorker: Worker;
   private ocrNameWorker: Worker;
-  public gradingScheme: GradingScheme = {...DEFAULT_GRADING_SCHEME};
 
   constructor(private route: ActivatedRoute,
               public examManager: ExamManagerService,
@@ -196,6 +195,10 @@ export class EvaluatorComponent implements OnInit {
     } else {
       return 'offline_bolt';
     }
+  }
+
+  gradeExams() {
+
   }
 
   private async addImageSrc(img: HTMLImageElement, src: string): Promise<void> {
@@ -452,9 +455,5 @@ export class EvaluatorComponent implements OnInit {
       }
     }
     this.pointCalculator.calculatePoints(sheet);
-  }
-
-  gradeExams() {
-
   }
 }

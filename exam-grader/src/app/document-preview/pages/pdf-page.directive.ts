@@ -1,4 +1,4 @@
-import {Directive, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Directive, ElementRef, Input} from '@angular/core';
 import {Page} from './pages.component';
 import * as pdfjsLib from 'pdfjs-dist';
 
@@ -6,6 +6,9 @@ import * as pdfjsLib from 'pdfjs-dist';
   selector: '[page]'
 })
 export class PdfPageDirective {
+  constructor(private elemRef: ElementRef) {
+  }
+
   private _page: Page;
 
   @Input() set page(val: Page) {
@@ -14,8 +17,6 @@ export class PdfPageDirective {
       this.renderOnCanvas(val);
     }
   }
-
-  constructor(private elemRef: ElementRef) { }
 
   private renderOnCanvas(page: Page) {
     const canvasRev = this.elemRef.nativeElement as HTMLCanvasElement;

@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ExamManagerService} from '../exam-manager.service';
 import {ElementListEntry, Question} from '../exam';
-import {MatCheckboxChange} from '@angular/material/checkbox';
-import {type} from 'os';
 
 @Component({
   selector: 'app-document-editor',
@@ -93,7 +91,7 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   toggleCheckbox(questionIndex: number, markIndex: number) {
-    for (let i = 0; i < this.examManager.exam.questions[questionIndex].elements.length; i++){
+    for (let i = 0; i < this.examManager.exam.questions[questionIndex].elements.length; i++) {
       const element = this.examManager.exam.questions[questionIndex].elements[i];
       if (typeof element !== 'boolean') {
         this.examManager.exam.questions[questionIndex].elements = this.examManager.realMarks(this.examManager.exam.questions[questionIndex]);

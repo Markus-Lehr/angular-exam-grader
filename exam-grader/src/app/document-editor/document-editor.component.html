@@ -20,7 +20,7 @@
 
   <mat-form-field appearance="fill">
     <mat-label>Answer options</mat-label>
-    <mat-select [(value)]="!!examManager.exam.trueAndFalse" (selectionChange)="examManager.modified = true">
+    <mat-select (selectionChange)="examManager.modified = true" [(value)]="!!examManager.exam.trueAndFalse">
       <mat-option [value]="true">True and False options</mat-option>
       <mat-option [value]="false">Only mark True answers</mat-option>
     </mat-select>
@@ -60,9 +60,9 @@
       </mat-form-field>
       <div class="mark-checkbox-container">
         <mat-checkbox (click)="toggleCheckbox(i,j)"
-                      *ngFor="let mark of examManager.realMarks(question); index as j" [disabled]="true"
-                      [labelPosition]="'before'"
-                      [checked]="mark" [disableRipple]="true">{{examManager.getChar(j)}}</mat-checkbox>
+                      *ngFor="let mark of examManager.realMarks(question); index as j" [checked]="mark"
+                      [disableRipple]="true"
+                      [disabled]="true" [labelPosition]="'before'">{{examManager.getChar(j)}}</mat-checkbox>
       </div>
     </mat-card-content>
   </mat-card>

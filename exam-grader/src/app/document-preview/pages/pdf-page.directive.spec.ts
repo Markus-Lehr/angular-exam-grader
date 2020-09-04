@@ -1,4 +1,4 @@
-import { PdfPageDirective } from './pdf-page.directive';
+import {PdfPageDirective} from './pdf-page.directive';
 
 describe('PdfPageDirective', () => {
   it('should create an instance', () => {
