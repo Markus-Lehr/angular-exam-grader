@@ -1,8 +1,63 @@
-<div class="management-wrapper">
-  <input #fileInput (change)="importFiles($event.target.files)" accept="image/*" multiple style="display: none"
-         type="file">
-  <button (click)="fileInput.click()" mat-raised-button>Import Files</button>
-  <button [routerLink]="['/exam', examManager.exam.id]" mat-raised-button>Edit Exam</button>
+<div class="overview-wrapper">
+  <mat-card class="management-wrapper">
+    <input #fileInput (change)="importFiles($event.target.files)" accept="image/*" multiple style="display: none"
+           type="file">
+    <button (click)="fileInput.click()" mat-raised-button>Import Files</button>
+    <button (click)="gradeExams()" mat-raised-button>Grade Exams</button>
+    <button [routerLink]="['/exam', examManager.exam.id]" mat-raised-button>Edit Exam</button>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Scoring Mode</mat-label>
+      <mat-select [(value)]="gradingScheme.scoringMode">
+        <mat-option [value]="'zero'">Start from 0 points</mat-option>
+        <mat-option [value]="'max'">Start from max points</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Correct Answers</mat-label>
+      <mat-select [(value)]="gradingScheme.correctAnswers">
+        <mat-option [value]="'plus'">Add their points to the total</mat-option>
+        <mat-option [value]="'nothing'">Do nothing</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Wrong Answers</mat-label>
+      <mat-select [(value)]="gradingScheme.wrongAnswers">
+        <mat-option [value]="'minus'">Subtract their points from the total</mat-option>
+        <mat-option [value]="'nothing'">Do nothing</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Ambiguous Answers</mat-label>
+      <mat-select [(value)]="gradingScheme.ambiguousAnswers">
+        <mat-option [value]="'wrong'">Count as wrong answers</mat-option>
+        <mat-option [value]="'correct'">Count as correct answers</mat-option>
+        <mat-option [value]="'nothing'">Do nothing</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Empty Answers</mat-label>
+      <mat-select [(value)]="gradingScheme.emptyAnswers">
+        <mat-option [value]="'nothing'">Do nothing</mat-option>
+        <mat-option [value]="'correct'">Count as correct answers</mat-option>
+        <mat-option [value]="'wrong'">Count as wrong answers</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Negative points per Question</mat-label>
+      <mat-select [(value)]="gradingScheme.negativePointsCarry">
+        <mat-option [value]="'zero'">Are counted as 0 points per question</mat-option>
+        <mat-option [value]="'carry'">Carry over to the total</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </mat-card>
+
   <mat-selection-list #fileSelectionList [multiple]="false">
     <mat-list-option *ngFor="let file of sheetNames" [value]="file">
       <mat-icon class="file-state-icon" mat-list-icon>{{iconForFile(file)}}</mat-icon>

@@ -11,6 +11,7 @@ import {createWorker, OEM, PSM, Worker} from 'tesseract.js';
 import PerspT from 'perspective-transform';
 import {PointCalculatorService} from '../point-calculator.service';
 import {LoadingService} from '../loading-screen/loading.service';
+import {min} from 'rxjs/operators';
 
 const leftPadding = 0;
 const rightPadding = 50;
@@ -26,6 +27,25 @@ const uncertainColor = 'rgb(255,200,0, .5)';
 
 const certaintyThreshold = 0.98; /* the certainty threshold needs to be exceeded in order for the library to be trusted */
 const inverseThreshold = 1 - certaintyThreshold;
+
+export interface GradingScheme {
+  scoringMode: 'zero' | 'max',
+  correctAnswers: 'plus' | 'nothing',
+  wrongAnswers: 'minus' | 'nothing',
+  ambiguousAnswers: 'wrong' | 'correct' | 'nothing',
+  emptyAnswers: 'wrong' | 'correct' | 'nothing',
+  negativePointsCarry: 'zero' | 'carry',
+}
+
+const DEFAULT_GRADING_SCHEME: GradingScheme = {
+  scoringMode: 'zero',
+  correctAnswers: 'plus',
+  wrongAnswers: 'nothing',
+  ambiguousAnswers: 'wrong',
+  emptyAnswers: 'nothing',
+  negativePointsCarry: 'zero'
+};
+
 
 @Component({
   selector: 'app-evaluator',
@@ -50,8 +70,9 @@ export class EvaluatorComponent implements OnInit {
   public sheetNames: string[] = [];
   private canvWidth = leftPadding + rightPadding;
   private canvHeight = topPadding + bottomPadding;
-  private orcDigitWorker: Worker;
-  private orcNameWorker: Worker;
+  private ocrDigitWorker: Worker;
+  private ocrNameWorker: Worker;
+  public gradingScheme: GradingScheme = {...DEFAULT_GRADING_SCHEME};
 
   constructor(private route: ActivatedRoute,
               public examManager: ExamManagerService,
@@ -80,25 +101,25 @@ export class EvaluatorComponent implements OnInit {
   }
 
   async initOcr(): Promise<void> {
-    this.orcDigitWorker = createWorker({
+    this.ocrDigitWorker = createWorker({
       // logger: m => console.log(m),
     });
-    await this.orcDigitWorker.load();
-    await this.orcDigitWorker.loadLanguage('deu');
-    await this.orcDigitWorker.initialize('deu');
-    await this.orcDigitWorker.setParameters({
+    await this.ocrDigitWorker.load();
+    await this.ocrDigitWorker.loadLanguage('deu');
+    await this.ocrDigitWorker.initialize('deu');
+    await this.ocrDigitWorker.setParameters({
       tessedit_ocr_engine_mode: OEM.DEFAULT,
       tessedit_pageseg_mode: PSM.SINGLE_CHAR,
       tessedit_char_whitelist: '0123456789',
     });
 
-    this.orcNameWorker = createWorker({
+    this.ocrNameWorker = createWorker({
       // logger: m => console.log(m),
     });
-    await this.orcNameWorker.load();
-    await this.orcNameWorker.loadLanguage('deu');
-    await this.orcNameWorker.initialize('deu', OEM.TESSERACT_LSTM_COMBINED);
-    await this.orcNameWorker.setParameters({
+    await this.ocrNameWorker.load();
+    await this.ocrNameWorker.loadLanguage('deu');
+    await this.ocrNameWorker.initialize('deu', OEM.TESSERACT_LSTM_COMBINED);
+    await this.ocrNameWorker.setParameters({
       tessedit_pageseg_mode: PSM.SINGLE_LINE,
       tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzäöüßABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ- \'`´',
     });
@@ -294,19 +315,19 @@ export class EvaluatorComponent implements OnInit {
 
     for (let i = 0; i < digitCanvases.length; i++) {
       const canvas = digitCanvases[i];
-      const immatResult = await this.orcDigitWorker.recognize(canvas);
+      const immatResult = await this.ocrDigitWorker.recognize(canvas);
       const immatText = immatResult.data.text;
       console.log('immatriculation digit', (i + 1), ':', immatText);
     }
     firstNameCx.drawImage(img, transformedFirstNamePoint[0], transformedFirstNamePoint[1],
       transformedNameWidth, transformedHeight, 0, 0, thirdInnerA4, 32);
-    const firstNameResult = await this.orcNameWorker.recognize(firstNameCanvas);
+    const firstNameResult = await this.ocrNameWorker.recognize(firstNameCanvas);
     const firstNameText = firstNameResult.data.text;
     console.log('first name:', firstNameText);
 
     lastNameCx.drawImage(img, transformedLastNamePoint[0], transformedLastNamePoint[1],
       transformedNameWidth, transformedHeight, 0, 0, thirdInnerA4, 32);
-    const lastNameResult = await this.orcNameWorker.recognize(lastNameCanvas);
+    const lastNameResult = await this.ocrNameWorker.recognize(lastNameCanvas);
     const lastNameText = lastNameResult.data.text;
     console.log('last name:', lastNameText);
   }
@@ -431,5 +452,9 @@ export class EvaluatorComponent implements OnInit {
       }
     }
     this.pointCalculator.calculatePoints(sheet);
+  }
+
+  gradeExams() {
+
   }
 }
