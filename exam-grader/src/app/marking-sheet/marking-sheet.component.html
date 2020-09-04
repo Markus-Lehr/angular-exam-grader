@@ -34,15 +34,16 @@
         <div *ngFor="let question of examManager.exam.questions; index as i" class="question-row debug-border">
           <div class="question-label">
             <label>Question {{i + 1}}:</label>
-            <label>True</label>
-            <label>False</label>
+            <label *ngIf="examManager.exam.trueAndFalse">True</label>
+            <label *ngIf="examManager.exam.trueAndFalse">False</label>
           </div>
           <div class="mark-slices">
             <div *ngFor="let mark of examManager.realMarks(question); index as j" class="mark-slice">
               <label>({{examManager.getChar(j)}})</label>
               <mat-checkbox [checked]="getChecked(i, j, mark, true)" [color]="getColor(i, j)"
                             [disabled]="evaluation === undefined"></mat-checkbox>
-              <mat-checkbox [checked]="getChecked(i, j, mark, false)" [color]="getColor(i, j)"
+              <mat-checkbox *ngIf="examManager.exam.trueAndFalse"
+                            [checked]="getChecked(i, j, mark, false)" [color]="getColor(i, j)"
                             [disabled]="evaluation === undefined"></mat-checkbox>
             </div>
           </div>

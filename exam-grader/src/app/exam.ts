@@ -40,6 +40,7 @@ export interface Exam {
   title: string;
   date: Date;
   markingSheetOnly?: boolean;
+  trueAndFalse: boolean;
 
   questions: Question[];
   customPdfs: PdfEntry[]; // store pdf ids

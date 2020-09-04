@@ -113,6 +113,7 @@ export class StorageService {
 
   public async createNewExam(): Promise<any> {
     const exam: Exam = {
+      trueAndFalse: false,
       date: new Date(),
       customPdfs: [], elementOrder: [], questions: [],
       title: 'New Exam'

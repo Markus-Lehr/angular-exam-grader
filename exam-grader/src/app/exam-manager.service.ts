@@ -5,6 +5,7 @@ import * as FileSaver from 'file-saver';
 import {StorageService} from './storage.service';
 
 const demoExam: Exam = {
+  trueAndFalse: true,
   customPdfs: [], date: undefined, elementOrder: [], questions: [], title: ''
 };
 
@@ -156,6 +157,7 @@ export class ExamManagerService {
   private generateNewExam(examId: number): void {
     console.log('generating new exam');
     this.exam = {
+      trueAndFalse: true,
       id: examId,
       date: new Date(),
       questions: [], customPdfs: [], elementOrder: [],

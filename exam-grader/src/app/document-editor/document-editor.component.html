@@ -17,6 +17,14 @@
     <mat-label>Exam Date</mat-label>
     <input (change)="examManager.modified = true" [(ngModel)]="examManager.exam.date" matInput type="date">
   </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Answer options</mat-label>
+    <mat-select [(value)]="!!examManager.exam.trueAndFalse" (selectionChange)="examManager.modified = true">
+      <mat-option [value]="true">True and False options</mat-option>
+      <mat-option [value]="false">Only mark True answers</mat-option>
+    </mat-select>
+  </mat-form-field>
   <p *ngIf="!examManager?.exam.markingSheetOnly" class="management-row">
     Add new Element:
     <mat-button-toggle-group aria-label="Font Style" name="fontStyle">
