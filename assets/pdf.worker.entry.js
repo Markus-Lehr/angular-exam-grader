@@ -14,6 +14,6 @@
  */
 
 (typeof window !== "undefined"
-  ? window
-  : {}
+    ? window
+    : {}
 ).pdfjsWorker = require("./pdf.worker.js");
