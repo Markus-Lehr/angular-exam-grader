@@ -11,7 +11,7 @@ import {MarkingSheetComponent} from './marking-sheet/marking-sheet.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
-import {ExamListComponent} from './exam-list/exam-list.component';
+import {DeleteExamDialogComponent, ExamListComponent} from './exam-list/exam-list.component';
 import {ExamEditorComponent} from './exam-editor/exam-editor.component';
 import {MatTableModule} from '@angular/material/table';
 import {MatInputModule} from '@angular/material/input';
@@ -51,6 +51,7 @@ import {PdfPageDirective} from './document-preview/pages/pdf-page.directive';
     EvaluatorComponent,
     DocumentDownloadDialogComponent,
     LoadingScreenComponent,
+    DeleteExamDialogComponent,
     PdfPageDirective
   ],
   imports: [

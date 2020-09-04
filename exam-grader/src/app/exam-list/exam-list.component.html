@@ -13,6 +13,14 @@
     <th *matHeaderCellDef mat-header-cell>ID</th>
     <td *matCellDef="let exam" mat-cell> {{exam.id}} </td>
   </ng-container>
+  <ng-container matColumnDef="actions">
+    <th *matHeaderCellDef mat-header-cell>Delete</th>
+    <td *matCellDef="let exam" mat-cell>
+      <button mat-mini-fab color="warn" (click)="deleteExam($event, exam)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
 
   <tr *matHeaderRowDef="columnsToDisplay" mat-header-row></tr>
   <tr *matRowDef="let myRowData; columns: columnsToDisplay" [routerLink]="['/exam/' + myRowData.id]" mat-row></tr>

@@ -212,4 +212,12 @@ export class StorageService {
       return exam;
     }
   }
+
+  public deleteExam(id: number) {
+    const tx = this.db.transaction(DB_EXAM_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(DB_EXAM_STORE_NAME);
+    store.delete(id).then(() => {
+      this.initExamList();
+    });
+  }
 }

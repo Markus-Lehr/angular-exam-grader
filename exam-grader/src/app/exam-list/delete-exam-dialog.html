@@ -1,0 +1,9 @@
+<h1 mat-dialog-title>Delete Exam?</h1>
+<div mat-dialog-content>
+  <p>Confirm the deletion of exam "{{data.examName}}" with the ID {{data.id}}.</p>
+  <p>This operation is irreversible. Make sure that you have exported your exam as JSON, if you want to keep a copy.</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button (click)="deleteExam()" mat-button>Delete</button>
+</div>
