@@ -127,6 +127,14 @@ export class StorageService {
     return store.put(file);
   }
 
+  public deleteExam(id: number) {
+    const tx = this.db.transaction(DB_EXAM_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(DB_EXAM_STORE_NAME);
+    store.delete(id).then(() => {
+      this.initExamList();
+    });
+  }
+
   private upgrade(database: IDBPDatabase, oldVersion: number, newVersion: number | null, transaction: IDBPTransaction): void {
     if (!database.objectStoreNames.contains(DB_EXAM_STORE_NAME)) {
       database.createObjectStore(DB_EXAM_STORE_NAME, {keyPath: 'id', autoIncrement: true});
@@ -211,13 +219,5 @@ export class StorageService {
     } else {
       return exam;
     }
-  }
-
-  public deleteExam(id: number) {
-    const tx = this.db.transaction(DB_EXAM_STORE_NAME, 'readwrite');
-    const store = tx.objectStore(DB_EXAM_STORE_NAME);
-    store.delete(id).then(() => {
-      this.initExamList();
-    });
   }
 }

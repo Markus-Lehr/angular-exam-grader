@@ -44,7 +44,8 @@ export class DeleteExamDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<DeleteExamDialogComponent>,
     private store: StorageService,
-    @Inject(MAT_DIALOG_DATA) public data: ExamListEntry) {}
+    @Inject(MAT_DIALOG_DATA) public data: ExamListEntry) {
+  }
 
   onNoClick(): void {
     this.dialogRef.close();

@@ -1,6 +1,11 @@
 <button (click)="createNew()" class="new-exam-button" color="accent" mat-raised-button>Create New Exam</button>
 
-<table [dataSource]="store.examEntries" mat-table>
+<h1 *ngIf="!store?.examEntries || ((store.examEntries | async).length === 0) ">
+  Yo do not have any exams stored yet. If you are unsure what to do, visit our <a [routerLink]="['/about']">About
+  page</a>.
+</h1>
+
+<table *ngIf="store?.examEntries" [dataSource]="store.examEntries" mat-table>
   <ng-container matColumnDef="examName">
     <th *matHeaderCellDef mat-header-cell>Name</th>
     <td *matCellDef="let exam" mat-cell> {{exam.examName}} </td>
@@ -16,7 +21,7 @@
   <ng-container matColumnDef="actions">
     <th *matHeaderCellDef mat-header-cell>Delete</th>
     <td *matCellDef="let exam" mat-cell>
-      <button mat-mini-fab color="warn" (click)="deleteExam($event, exam)">
+      <button (click)="deleteExam($event, exam)" color="warn" mat-mini-fab>
         <mat-icon>delete</mat-icon>
       </button>
     </td>
