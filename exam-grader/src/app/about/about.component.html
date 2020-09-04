@@ -1,0 +1,45 @@
+<mat-card>
+  <mat-card-content>
+    <h1>About Exam Editor</h1>
+    <h2>THIS TOOL HAS NOT BEEN TESTED IN ANY REAL EXAM YET, WE ADVISE UTMOST CAUTION FOR CRITICAL EXAMS.</h2>
+    <p>
+      Exam Editor is a free, open source tool for creating and/or automatically marking multiple choice exams.
+    </p>
+    <p>
+      You can find the source code on Github at <a href="https://github.com/Markus-Lehr/angular-exam-grader">Markus-Lehr/angular-exam-grader</a>.
+    </p>
+    <h2>How do I use it?</h2>
+    <p>
+      You essentially have two options.
+      Either create an exam from scratch (adding questions, insert existing pdf pages), which can then be exported as pdf and printed.
+      Or you can take your existing multiple choice exams and simply create a grading sheet that fits your existing exam's questions.
+    </p>
+    <p>
+      Either way, your students simply need to cross their answers on the grading sheet, which is the only essential grading material that you need to collect.
+    </p>
+    <p>
+      After you're done and the exam has been conducted, scan in your grading sheets in greyscale and with 150 DPI as individual images (e.g. JPG), and import them into the grading tool.
+      You may specify how you want to count points or change other modality options before starting the grading process.
+    </p>
+    <p>
+      For every inserted image, the tool calculates each question's points and totals them.
+    </p>
+    <h2>Where is my data stored?</h2>
+    <p>
+      Exam Editor manages data completely offline in your browser's indexedDB. We do not transmit any data to any server - we don't even have a backend server for this project.
+    </p>
+    <p>
+      Therefore, we advise you to backup your exams yourself by exporting them as JSON files. Note that any images or PDFs that you inserted in the exam will not be exported that way in order to save space.
+    </p>
+    <h2>Which exams can I create with the tool? </h2>
+    <p>
+      Essentially any multiple choice exam.
+    </p>
+    <p>
+      The editor supports inline LateX commands (e.g. $\sum_{{'{'}}0 \leq i \leq k{{'}'}} i$ becomes <ng-katex [equation]="'\\sum_{0 \\leq i \\leq k} i'"></ng-katex>),
+    </p>
+    <p>
+      as well as importing whole PDFs. Therefore, should the tool not satisfy your needs, don't use it and import whatever you created elsewhere.
+    </p>
+  </mat-card-content>
+</mat-card>

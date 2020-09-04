@@ -4,6 +4,9 @@
     <mat-icon>fact_check</mat-icon>
   </button>
   <span>Exam Grader</span>
+  <button [routerLink]="['/about']" mat-icon-button>
+    <mat-icon [matTooltip]="'About'">help_outline</mat-icon>
+  </button>
 </mat-toolbar>
 <router-outlet></router-outlet>
 

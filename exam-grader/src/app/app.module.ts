@@ -33,6 +33,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {PdfViewerModule} from 'ng2-pdf-viewer';
 import {PdfPageDirective} from './document-preview/pages/pdf-page.directive';
+import { AboutComponent } from './about/about.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 
 @NgModule({
@@ -52,7 +54,8 @@ import {PdfPageDirective} from './document-preview/pages/pdf-page.directive';
     DocumentDownloadDialogComponent,
     LoadingScreenComponent,
     DeleteExamDialogComponent,
-    PdfPageDirective
+    PdfPageDirective,
+    AboutComponent
   ],
   imports: [
     BrowserModule,
@@ -73,7 +76,8 @@ import {PdfPageDirective} from './document-preview/pages/pdf-page.directive';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatButtonToggleModule,
-    PdfViewerModule
+    PdfViewerModule,
+    MatTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent]
